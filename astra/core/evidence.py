@@ -13,9 +13,16 @@ GENESIS_HASH = "0000000000000000000000000000000000000000000000000000000000000000
 class EvidenceLedger:
     def __init__(self, ledger_file: Optional[Path] = None):
         self.ledger_path = ledger_file or config.evidence_ledger_path
-        self.ledger_path.parent.mkdir(parents=True, exist_ok=True)
-        if not self.ledger_path.exists():
-            self.ledger_path.touch()
+        try:
+            self.ledger_path.parent.mkdir(parents=True, exist_ok=True)
+            if not self.ledger_path.exists():
+                self.ledger_path.touch()
+        except (PermissionError, OSError):
+            fallback_dir = Path.home() / ".astra" / "data"
+            fallback_dir.mkdir(parents=True, exist_ok=True)
+            self.ledger_path = fallback_dir / "evidence_ledger.jsonl"
+            if not self.ledger_path.exists():
+                self.ledger_path.touch()
 
     def _get_last_block_hash(self) -> str:
         last_hash = GENESIS_HASH

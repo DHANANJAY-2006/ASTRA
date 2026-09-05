@@ -28,13 +28,15 @@ python -m pip install -e .
 
 ### Step 2: Run the Tool Immediately
 
-You can use ASTRA via **Interactive Forensic Web Workstation** or **Headless Terminal CLI**:
+You can use ASTRA via **Interactive Forensic Canvas** or **Headless Terminal CLI**:
 
-#### Option A: Launch Interactive Analyst Workstation (Recommended)
+#### Option A: Launch Central Interactive Investigation Canvas (Standalone / Zero-Server)
 ```powershell
 python -m astra.cli.main ui
+# Or directly:
+python -m astra --graph
 ```
-*Automatically boots the FastAPI engine and opens `http://localhost:8000/` in your browser with the central force-directed graph, actor dossiers, timeline, 4-pillar diagnostics, and live demo.*
+*Instantly renders the multi-pillar de-anonymization network canvas and opens it directly in your web browser. Completely serverless, 100% offline-ready, with zero port or background daemon requirements.*
 
 #### Option B: Terminal CLI Operations
 ```powershell
@@ -151,7 +153,7 @@ python -m astra.cli.main verify-chain
 
 | Command | Purpose |
 | :--- | :--- |
-| `astra ui` | Launch full interactive React/Vite workstation + FastAPI backend at `http://localhost:8000/` |
+| `astra ui` | Launch central interactive forensic investigation canvas directly in default browser |
 | `astra pipeline` | Run end-to-end multi-persona attribution pipeline with UTXO clustering |
 | `astra demo` | Execute controlled SIH 2026 judge presentation de-anonymization walkthrough |
 | `astra personas` | Display inventory of tracked darknet marketplace vendor personas |

@@ -7,7 +7,7 @@
 ### Case Information
 - **Case Reference ID**: `ASTRA-CASE-26151`
 - **Target Persona**: `VektorVendor_X`
-- **Generated At**: `2026-09-05T14:18:13.292996+00:00`
+- **Generated At**: `2026-09-05T14:37:54.485962+00:00`
 - **DACS Attribution Confidence**: **`100.0%`**
 - **Verdict**: **`HIGH CONFIDENCE ATTRIBUTION (SECTION 65B COURT ADMISSIBLE)`**
 
@@ -36,8 +36,8 @@
 
 ### Section 65B Indian Evidence Act / BSA 2023 Verification
 - **Status**: `AUTHENTIC_AND_VERIFIED`
-- **Cumulative SHA-256 Chain Anchor**: `69f4e6c14f97e6027a5c93ab7a69726aa3c0346ff5080b293cd5c06e2bdf279e`
-- **Evidence Blocks Verified**: `648`
+- **Cumulative SHA-256 Chain Anchor**: `38b63b3be0b71b2a4b007655895ae4c1eccae4b27332af1b65f6ce1de7ac0af5`
+- **Evidence Blocks Verified**: `942`
 - **Statutory Declaration**:  
   > *"This is to certify that the computer output containing threat intelligence and de-anonymization telemetries produced by ASTRA was generated during the regular course of autonomous passive reconnaissance under continuous SHA-256 cryptographic chain-of-custody."*
 

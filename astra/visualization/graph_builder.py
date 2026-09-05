@@ -477,88 +477,246 @@ class ForensicGraphBuilder:
 
   <script>
     const data = {graph_json};
-    const svg = d3.select("#network-canvas");
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const svgEl = document.getElementById("network-canvas");
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let zoomScale = 1;
+    let panX = 0;
+    let panY = 0;
+    let isPanning = false;
+    let startX = 0;
+    let startY = 0;
 
-    const g = svg.append("g");
-    const zoom = d3.zoom().scaleExtent([0.2, 3]).on("zoom", (e) => g.attr("transform", e.transform));
-    svg.call(zoom);
-
-    const simulation = d3.forceSimulation(data.nodes)
-      .force("link", d3.forceLink(data.links).id(d => d.id).distance(140))
-      .force("charge", d3.forceManyBody().strength(-450))
-      .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collision", d3.forceCollide().radius(d => d.size + 15));
-
-    const link = g.append("g")
-      .selectAll("line")
-      .data(data.links)
-      .join("line")
-      .attr("class", "link");
-
-    const node = g.append("g")
-      .selectAll("g")
-      .data(data.nodes)
-      .join("g")
-      .attr("class", "node")
-      .call(d3.drag()
-        .on("start", dragstarted)
-        .on("drag", dragged)
-        .on("end", dragended));
-
-    node.append("circle")
-      .attr("r", d => d.size)
-      .attr("fill", d => d.color)
-      .attr("stroke", "#ffffff")
-      .attr("stroke-opacity", 0.3);
-
-    node.append("text")
-      .attr("dx", d => d.size + 6)
-      .attr("dy", "0.35em")
-      .text(d => d.label);
-
-    node.on("click", (event, d) => {{
-      event.stopPropagation();
-      openInspector(d);
-    }});
-
-    svg.on("click", () => closeInspector());
-
-    simulation.on("tick", () => {{
-      link
-        .attr("x1", d => d.source.x)
-        .attr("y1", d => d.source.y)
-        .attr("x2", d => d.target.x)
-        .attr("y2", d => d.target.y);
-
-      node.attr("transform", d => `translate(${{d.x}},${{d.y}})`);
-    }});
-
-    function dragstarted(event, d) {{
-      if (!event.active) simulation.alphaTarget(0.3).restart();
-      d.fx = d.x;
-      d.fy = d.y;
+    function applyTransform() {{
+      const g = document.getElementById("viewport-group");
+      if (g) {{
+        g.setAttribute("transform", `translate(${{panX}}, ${{panY}}) scale(${{zoomScale}})`);
+      }}
     }}
 
-    function dragged(event, d) {{
-      d.fx = event.x;
-      d.fy = event.y;
+    function initGraph() {{
+      if (window.d3 && window.d3.forceSimulation) {{
+        runD3Simulation();
+      }} else {{
+        runOfflineSimulation();
+      }}
     }}
 
-    function dragended(event, d) {{
-      if (!event.active) simulation.alphaTarget(0);
-      d.fx = null;
-      d.fy = null;
+    function runD3Simulation() {{
+      const svg = d3.select("#network-canvas");
+      const g = svg.append("g").attr("id", "viewport-group");
+      const zoom = d3.zoom().scaleExtent([0.2, 3]).on("zoom", (e) => g.attr("transform", e.transform));
+      svg.call(zoom);
+
+      const simulation = d3.forceSimulation(data.nodes)
+        .force("link", d3.forceLink(data.links).id(d => d.id).distance(140))
+        .force("charge", d3.forceManyBody().strength(-450))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("collision", d3.forceCollide().radius(d => d.size + 15));
+
+      const link = g.append("g")
+        .selectAll("line")
+        .data(data.links)
+        .join("line")
+        .attr("class", "link");
+
+      const node = g.append("g")
+        .selectAll("g")
+        .data(data.nodes)
+        .join("g")
+        .attr("class", "node")
+        .call(d3.drag()
+          .on("start", (event, d) => {{
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+          }})
+          .on("drag", (event, d) => {{
+            d.fx = event.x;
+            d.fy = event.y;
+          }})
+          .on("end", (event, d) => {{
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+          }}));
+
+      node.append("circle")
+        .attr("r", d => d.size)
+        .attr("fill", d => d.color)
+        .attr("stroke", "#ffffff")
+        .attr("stroke-opacity", 0.3);
+
+      node.append("text")
+        .attr("dx", d => d.size + 6)
+        .attr("dy", "0.35em")
+        .text(d => d.label);
+
+      node.on("click", (event, d) => {{
+        event.stopPropagation();
+        openInspector(d);
+      }});
+
+      svg.on("click", () => closeInspector());
+
+      simulation.on("tick", () => {{
+        link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+        node.attr("transform", d => `translate(${{d.x}},${{d.y}})`);
+      }});
+    }}
+
+    function runOfflineSimulation() {{
+      svgEl.innerHTML = "";
+      const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      g.setAttribute("id", "viewport-group");
+      svgEl.appendChild(g);
+
+      const nodeMap = new Map();
+      const n = data.nodes.length;
+      const radius = Math.min(width, height) / 3;
+      const centerX = width / 2;
+      const centerY = height / 2;
+
+      data.nodes.forEach((node, i) => {{
+        const angle = (2 * Math.PI * i) / Math.max(n, 1);
+        node.x = centerX + radius * Math.cos(angle);
+        node.y = centerY + radius * Math.sin(angle);
+        nodeMap.set(node.id, node);
+      }});
+
+      const linksGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      const nodesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      g.appendChild(linksGroup);
+      g.appendChild(nodesGroup);
+
+      const linkElements = [];
+      data.links.forEach(l => {{
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("class", "link");
+        linksGroup.appendChild(line);
+        linkElements.push({{ el: line, source: l.source, target: l.target }});
+      }});
+
+      const nodeElements = [];
+      data.nodes.forEach(node => {{
+        const nodeG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        nodeG.setAttribute("class", "node");
+        nodeG.style.cursor = "pointer";
+
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("r", node.size || 18);
+        circle.setAttribute("fill", node.color || "#a855f7");
+        circle.setAttribute("stroke", "#ffffff");
+        circle.setAttribute("stroke-opacity", "0.4");
+        circle.setAttribute("stroke-width", "2");
+
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("dx", (node.size || 18) + 6);
+        text.setAttribute("dy", "0.35em");
+        text.textContent = node.label;
+
+        nodeG.appendChild(circle);
+        nodeG.appendChild(text);
+
+        nodeG.addEventListener("click", (e) => {{
+          e.stopPropagation();
+          openInspector(node);
+        }});
+
+        nodesGroup.appendChild(nodeG);
+        nodeElements.push({{ el: nodeG, node: node }});
+      }});
+
+      for (let iter = 0; iter < 240; iter++) {{
+        for (let i = 0; i < data.nodes.length; i++) {{
+          for (let j = i + 1; j < data.nodes.length; j++) {{
+            const a = data.nodes[i];
+            const b = data.nodes[j];
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+            const distSq = Math.max(dx * dx + dy * dy, 1);
+            const dist = Math.sqrt(distSq);
+            const force = 9000 / distSq;
+            const fx = (dx / dist) * force;
+            const fy = (dy / dist) * force;
+            a.x += fx;
+            a.y += fy;
+            b.x -= fx;
+            b.y -= fy;
+          }}
+        }}
+
+        data.links.forEach(l => {{
+          const s = typeof l.source === "object" ? l.source : nodeMap.get(l.source);
+          const t = typeof l.target === "object" ? l.target : nodeMap.get(l.target);
+          if (!s || !t) return;
+          const dx = t.x - s.x;
+          const dy = t.y - s.y;
+          const dist = Math.max(Math.sqrt(dx * dx + dy * dy), 1);
+          const displacement = dist - 130;
+          const fx = (dx / dist) * displacement * 0.04;
+          const fy = (dy / dist) * displacement * 0.04;
+          s.x += fx;
+          s.y += fy;
+          t.x -= fx;
+          t.y -= fy;
+        }});
+
+        data.nodes.forEach(node => {{
+          node.x += (centerX - node.x) * 0.03;
+          node.y += (centerY - node.y) * 0.03;
+        }});
+      }}
+
+      linkElements.forEach(item => {{
+        const s = typeof item.source === "object" ? item.source : nodeMap.get(item.source);
+        const t = typeof item.target === "object" ? item.target : nodeMap.get(item.target);
+        if (s && t) {{
+          item.el.setAttribute("x1", s.x);
+          item.el.setAttribute("y1", s.y);
+          item.el.setAttribute("x2", t.x);
+          item.el.setAttribute("y2", t.y);
+        }}
+      }});
+      nodeElements.forEach(item => {{
+        item.el.setAttribute("transform", `translate(${{item.node.x}}, ${{item.node.y}})`);
+      }});
+
+      svgEl.addEventListener("mousedown", (e) => {{
+        if (e.target === svgEl || e.target.tagName === "svg" || e.target.id === "viewport-group") {{
+          isPanning = true;
+          startX = e.clientX - panX;
+          startY = e.clientY - panY;
+        }}
+      }});
+      window.addEventListener("mousemove", (e) => {{
+        if (isPanning) {{
+          panX = e.clientX - startX;
+          panY = e.clientY - startY;
+          applyTransform();
+        }}
+      }});
+      window.addEventListener("mouseup", () => {{ isPanning = false; }});
+      svgEl.addEventListener("wheel", (e) => {{
+        e.preventDefault();
+        const factor = e.deltaY > 0 ? 0.9 : 1.1;
+        zoomScale = Math.max(0.2, Math.min(3, zoomScale * factor));
+        applyTransform();
+      }});
     }}
 
     function openInspector(d) {{
       const p = document.getElementById("inspector-panel");
       document.getElementById("panel-node-title").textContent = d.label;
-      document.getElementById("panel-type").textContent = d.type;
-      document.getElementById("panel-pillar").textContent = d.pillar;
-      document.getElementById("panel-conf").textContent = d.confidence;
-      document.getElementById("panel-details").textContent = d.details;
+      document.getElementById("panel-type").textContent = d.type || "-";
+      document.getElementById("panel-pillar").textContent = d.pillar || "-";
+      document.getElementById("panel-conf").textContent = d.confidence || "-";
+      document.getElementById("panel-details").textContent = d.details || "-";
       p.classList.remove("hidden");
     }}
 
@@ -567,7 +725,19 @@ class ForensicGraphBuilder:
     }}
 
     function resetZoom() {{
-      svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
+      if (window.d3 && window.d3.select) {{
+        const svg = d3.select("#network-canvas");
+        svg.transition().duration(750).call(d3.zoom().transform, d3.zoomIdentity);
+      }}
+      zoomScale = 1;
+      panX = 0;
+      panY = 0;
+      applyTransform();
+    }}
+
+    window.addEventListener("DOMContentLoaded", initGraph);
+    if (document.readyState === "complete" || document.readyState === "interactive") {{
+      initGraph();
     }}
   </script>
 </body>

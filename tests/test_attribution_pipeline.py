@@ -35,3 +35,15 @@ def test_attribution_pipeline_run():
     assert primary.dacs_score >= 80.0
     assert len(primary.aliases) >= 2
     assert primary.chain_hash != ""
+
+def test_demo_scenario_and_run():
+    from astra.services.attribution_pipeline import get_demo_scenario, execute_demo_run
+    scenario = get_demo_scenario()
+    assert "Problem 26151" in scenario["problem_statement"]
+    assert len(scenario["steps"]) == 7
+
+    res = execute_demo_run()
+    assert res["status"] == "COMPLETED"
+    assert res["primary_alias"] == "vektor_ops"
+    assert res["dacs_score"] >= 80.0
+    assert len(res["linked_aliases"]) >= 2

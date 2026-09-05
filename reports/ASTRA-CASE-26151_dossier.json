@@ -3,7 +3,7 @@
   "report": {
     "case_id": "ASTRA-CASE-26151",
     "target_persona": "VektorVendor_X",
-    "generated_at": "2026-09-05 14:18:13.292996+00:00",
+    "generated_at": "2026-09-05 14:37:54.485962+00:00",
     "dacs_score": 100.0,
     "attribution_verdict": "HIGH CONFIDENCE ATTRIBUTION (SECTION 65B COURT ADMISSIBLE)",
     "pillar_scores": {
@@ -12,8 +12,8 @@
       "P3_CMTBP": 0.95,
       "P4_CAA": 0.625
     },
-    "chain_of_custody_hash": "69f4e6c14f97e6027a5c93ab7a69726aa3c0346ff5080b293cd5c06e2bdf279e",
-    "evidence_count": 648,
+    "chain_of_custody_hash": "38b63b3be0b71b2a4b007655895ae4c1eccae4b27332af1b65f6ce1de7ac0af5",
+    "evidence_count": 942,
     "key_findings": [
       "[P1] CRITICAL: SAN leaks clearnet domain 'auth.vektor-ops.ru' on darknet service",
       "[P1] CRITICAL: SAN leaks clearnet domain '185.220.101.5' on darknet service",
@@ -28,11 +28,11 @@
   "section_65b_certificate": {
     "certificate_title": "CERTIFICATE UNDER SECTION 65B INDIAN EVIDENCE ACT / BSA 2023",
     "case_reference": "ASTRA-CASE-26151",
-    "issued_at": "2026-09-05T14:18:13.302871+00:00",
+    "issued_at": "2026-09-05T14:37:54.497013+00:00",
     "forensic_tool": "ASTRA Forensic Intelligence Engine",
     "verification_status": "AUTHENTIC_AND_VERIFIED",
-    "chain_records_count": 648,
-    "cumulative_evidence_hash": "69f4e6c14f97e6027a5c93ab7a69726aa3c0346ff5080b293cd5c06e2bdf279e",
+    "chain_records_count": 942,
+    "cumulative_evidence_hash": "38b63b3be0b71b2a4b007655895ae4c1eccae4b27332af1b65f6ce1de7ac0af5",
     "statutory_declaration": "This is to certify that the computer output containing threat intelligence and de-anonymization telemetries produced by ASTRA was generated during the regular course of autonomous passive reconnaissance under continuous SHA-256 cryptographic chain-of-custody."
   }
 }

@@ -21,6 +21,7 @@ from rich.progress import Progress, TextColumn
 from rich import box
 
 from astra import __version__
+from astra.config import config
 from astra.core.evidence import ledger
 from astra.core.taxonomy import taxonomy_classifier
 from astra.pillars.infra_scan import infra_scanner
@@ -48,7 +49,14 @@ def print_banner():
     console.print(Panel(banner_text, box=box.ROUNDED, border_style="cyan"))
 
 @app.callback(invoke_without_command=True)
-def main_callback(ctx: typer.Context):
+def main_callback(
+    ctx: typer.Context,
+    graph: bool = typer.Option(False, "--graph", "-g", help="Launch interactive forensic investigation graph canvas"),
+    ui: bool = typer.Option(False, "--ui", help="Launch interactive forensic investigation graph canvas")
+):
+    if graph or ui:
+        render_and_open_investigation_graph()
+        raise typer.Exit(code=0)
     if ctx.invoked_subcommand is None:
         print_banner()
         console.print("[yellow]Use [bold]astra --help[/bold] to see available forensic commands.[/yellow]")
@@ -266,10 +274,12 @@ def correlate_cmd(
     )
     console.print(Panel(summary_panel, title="[bold]DE-ANONYMIZATION VERDICT[/bold]", border_style="green"))
 
-    json_path = Path(f"./reports/{case_id}_dossier.json")
-    md_path = Path(f"./reports/{case_id}_brief.md")
-    stix_path = Path(f"./reports/{case_id}_stix21.json")
-    graph_path = Path(f"./reports/{case_id}_investigation_graph.html")
+    reports_dir = config.reports_dir
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    json_path = reports_dir / f"{case_id}_dossier.json"
+    md_path = reports_dir / f"{case_id}_brief.md"
+    stix_path = reports_dir / f"{case_id}_stix21.json"
+    graph_path = reports_dir / f"{case_id}_investigation_graph.html"
 
     ForensicDossierExporter.export_json(report, json_path)
     ForensicDossierExporter.export_markdown(report, md_path)
@@ -289,14 +299,13 @@ def correlate_cmd(
     if open_graph:
         webbrowser.open(graph_path.resolve().as_uri())
 
-@app.command("graph")
-def graph_cmd(
-    case_id: str = typer.Option("ASTRA-CASE-26151", "--case", "-c", help="Case reference ID"),
-    persona: str = typer.Option("VektorVendor_X", "--persona", "-p", help="Target threat persona"),
-    open_browser: bool = typer.Option(True, "--open/--no-open", help="Open generated graph in web browser")
-):
+def render_and_open_investigation_graph(
+    case_id: str = "ASTRA-CASE-26151",
+    persona: str = "VektorVendor_X",
+    open_browser: bool = True
+) -> Path:
     print_banner()
-    console.print(f"[bold cyan]Rendering Interactive Forensic Graph for:[/bold cyan] [bold white]{persona}[/bold white]")
+    console.print(f"[bold cyan]Synthesizing Central Interactive Investigation Canvas for:[/bold cyan] [bold white]{persona}[/bold white]")
 
     report = dacs_engine.fuse_signals(
         case_id=case_id,
@@ -327,55 +336,31 @@ def graph_cmd(
         )
     )
 
-    graph_path = Path(f"./reports/{case_id}_investigation_graph.html")
+    reports_dir = config.reports_dir
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    graph_path = reports_dir / f"{case_id}_investigation_graph.html"
     ForensicGraphBuilder.render_html(report, graph_path)
 
-    console.print(f"[bold green]Interactive Graph Generated:[/bold green] [cyan]{graph_path.resolve()}[/cyan]")
+    console.print(f"[bold green]Interactive Forensic Canvas Generated:[/bold green] [cyan]{graph_path.resolve()}[/cyan]")
     if open_browser:
-        console.print("[dim]Opening interactive network canvas in your default web browser...[/dim]")
+        console.print("[dim]Opening interactive network canvas directly in your web browser (zero-server standalone)...[/dim]")
         webbrowser.open(graph_path.resolve().as_uri())
+    return graph_path
 
-@app.command("verify-chain")
-def verify_chain_cmd():
-    print_banner()
-    console.print("[bold blue]Auditing Section 65B / BSA 2023 Cryptographic Hash Chain...[/bold blue]")
-
-    status = ledger.verify_chain_integrity()
-    if status["valid"]:
-        console.print(Panel(
-            f"[bold green]CHAIN INTEGRITY VERIFIED: 100% INTACT[/bold green]\n\n"
-            f"[bold white]Total Evidentiary Records:[/bold white] {status['total_records']}\n"
-            f"[bold white]Head Block Hash:[/bold white] [cyan]{status['latest_block_hash']}[/cyan]\n"
-            f"[dim]{status['message']}[/dim]",
-            title="[bold green]Section 65B Digital Evidence Audit[/bold green]",
-            border_style="green"
-        ))
-    else:
-        console.print(Panel(
-            f"[bold red]CRITICAL: CHAIN TAMPERING DETECTED![/bold red]\n\n"
-            f"[bold white]Broken Line:[/bold white] {status.get('broken_at_line')}\n"
-            f"[bold white]Error:[/bold white] {status.get('error')}",
-            title="[bold red]Forensic Hash Chain Failure[/bold red]",
-            border_style="red"
-        ))
-        raise typer.Exit(code=1)
+@app.command("graph")
+def graph_cmd(
+    case_id: str = typer.Option("ASTRA-CASE-26151", "--case", "-c", help="Case reference ID"),
+    persona: str = typer.Option("VektorVendor_X", "--persona", "-p", help="Target threat persona"),
+    open_browser: bool = typer.Option(True, "--open/--no-open", help="Open generated graph in web browser")
+):
+    render_and_open_investigation_graph(case_id, persona, open_browser)
 
 @app.command("ui")
 def ui_cmd(
-    host: str = typer.Option("127.0.0.1", "--host", "-h", help="Host interface"),
-    port: int = typer.Option(8000, "--port", "-p", help="Port number"),
-    no_open: bool = typer.Option(False, "--no-open", help="Do not automatically open browser")
+    case_id: str = typer.Option("ASTRA-CASE-26151", "--case", "-c", help="Case reference ID"),
+    persona: str = typer.Option("VektorVendor_X", "--persona", "-p", help="Target threat persona")
 ):
-    print_banner()
-    console.print(f"[bold cyan]Launching Project ASTRA Forensic Analyst Workstation...[/bold cyan]")
-    console.print(f"[bold white]API Server URL:[/bold white] [cyan]http://{host}:{port}[/cyan]")
-    console.print(f"[bold white]Interactive Docs:[/bold white] [cyan]http://{host}:{port}/docs[/cyan]")
-
-    if not no_open:
-        webbrowser.open(f"http://{host}:{port}/")
-
-    import uvicorn
-    uvicorn.run("astra.server.app:app", host=host, port=port, reload=False)
+    render_and_open_investigation_graph(case_id, persona, True)
 
 @app.command("pipeline")
 def pipeline_cmd():
@@ -408,7 +393,7 @@ def pipeline_cmd():
 def demo_cmd():
     print_banner()
     console.print("[bold cyan]Running SIH 2026 Controlled De-Anonymization Demonstration...[/bold cyan]")
-    from astra.server.routes.demo import execute_demo_run
+    from astra.services.attribution_pipeline import execute_demo_run
     res = execute_demo_run()
     console.print(Panel(
         f"[bold green]DEMO PIPELINE STATUS: {res['status']}[/bold green]\n\n"
@@ -441,6 +426,30 @@ def personas_cmd():
             (p.pgp_key[:12] + "...") if p.pgp_key else "N/A"
         )
     console.print(table)
+
+@app.command("verify-chain")
+def verify_chain_cmd():
+    print_banner()
+    res = ledger.verify_chain_integrity()
+    if res["valid"]:
+        console.print(Panel(
+            f"[bold green]CHAIN INTEGRITY VERIFIED[/bold green]\n\n"
+            f"[bold white]Total Sealed Blocks:[/bold white] {res['total_records']}\n"
+            f"[bold white]Latest Block Hash:[/bold white] [cyan]{res['latest_block_hash']}[/cyan]\n"
+            f"[bold white]Custody Status:[/bold white] [green]{res['message']}[/green]",
+            title="[bold]Section 65B Cryptographic Audit[/bold]",
+            border_style="green"
+        ))
+    else:
+        console.print(Panel(
+            f"[bold red]INTEGRITY BREACH DETECTED[/bold red]\n\n"
+            f"[bold white]Broken Line:[/bold white] {res.get('broken_at_line')}\n"
+            f"[bold white]Evidence ID:[/bold white] {res.get('evidence_id')}\n"
+            f"[bold white]Error:[/bold white] {res.get('error')}",
+            title="[bold]Cryptographic Chain Audit Failed[/bold]",
+            border_style="red"
+        ))
+        raise typer.Exit(code=1)
 
 if __name__ == "__main__":
     app()
