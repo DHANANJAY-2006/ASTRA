@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   # Tor SOCKS5 Stealth Ingestion Proxy
   tor-proxy:

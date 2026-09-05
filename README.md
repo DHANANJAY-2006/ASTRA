@@ -27,8 +27,8 @@ git clone https://github.com/DHANANJAY-2006/ASTRA.git
 cd ASTRA
 
 # 2. Install dependencies & CLI in editable mode
-pip install -r requirements.txt
-pip install -e .
+python -m pip install -r requirements.txt
+python -m pip install -e .
 
 # 3. Verify installation
 python -m astra version
@@ -37,8 +37,8 @@ python -m astra version
 ### Method 2: Direct Install via Pip
 
 ```powershell
-pip install git+https://github.com/DHANANJAY-2006/ASTRA.git
-astra --help
+python -m pip install git+https://github.com/DHANANJAY-2006/ASTRA.git
+python -m astra --help
 ```
 
 ### Method 3: Run via Docker (Zero Configuration)
