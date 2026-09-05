@@ -17,36 +17,32 @@
 
 ---
 
-## ⚡ Quickstart: Install & Run on Your PC
+## ⚡ Quickstart: Run ASTRA on Your Computer
 
-### Method 1: Local Installation (Recommended)
+### Step 1: Install Dependencies (Run once)
 
 ```powershell
-# 1. Clone the repository
-git clone https://github.com/DHANANJAY-2006/ASTRA.git
-cd ASTRA
-
-# 2. Install dependencies & CLI in editable mode
+# In PowerShell or Command Prompt inside the ASTRA folder:
 python -m pip install -r requirements.txt
 python -m pip install -e .
-
-# 3. Verify installation
-python -m astra version
 ```
 
-### Method 2: Direct Install via Pip
+### Step 2: Run the Tool Immediately
+
+You do **not** need Docker. ASTRA runs directly on your computer with standard Python:
 
 ```powershell
-python -m pip install git+https://github.com/DHANANJAY-2006/ASTRA.git
-python -m astra --help
+# 1. Open the Central Interactive Visual Graph in your default web browser
+python -m astra graph --open
+
+# 2. Run the Full 4-Pillar De-Anonymization Engine & Export Court Dossiers
+python -m astra correlate --demo
+
+# 3. Or on Windows, simply double-click or run:
+.\launch.bat
 ```
 
-### Method 3: Run via Docker (Zero Configuration)
-
-```powershell
-docker compose up --build
-```
-Spins up the isolated **Tor SOCKS5 stealth proxy** and the **ASTRA Forensic Engine** automatically.
+> **Note on Docker (Optional)**: If you are deploying on a headless Linux server or wish to run through a containerized Tor SOCKS5 proxy, you can optionally run `docker compose up --build` (requires Docker Desktop / Docker daemon to be running). For local PCs, standard Python is recommended.
 
 ---
 
