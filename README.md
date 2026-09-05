@@ -17,33 +17,12 @@
 
 ---
 
-## 🌐 Live Web Demo (Mobile & Laptop Ready)
+## 🌐 Live Web Workstation (Vercel & Mobile Ready)
 
-- **Live Workstation (GitHub Pages)**: `https://dhananjay-2006.github.io/ASTRA/`
-- **Auto-Deployment**: Every `git push origin main` triggers an automatic GitHub Actions build and deploys the latest version in ~45 seconds. Opens directly on any phone, tablet, or laptop browser with zero installation!
+- **Production Deployment (Vercel)**: Connect repository to Vercel with framework preset **`Vite`** for auto-deploy on push.
+- **GitHub Pages Link**: `https://dhananjay-2006.github.io/ASTRA/`
+- **Instant Access**: Runs on any smartphone, iPad, or laptop web browser with zero installation, zero server daemons, and zero command-line input.
 
----
-
-## ⚡ 1-Click Launch on Your Computer
-
-### Method 1: Double-Click Launcher (Easiest for Judges & Evaluators)
-Simply double-click **`launch.bat`** in the project folder.  
-It automatically starts the Interactive Analyst Web Workstation and opens `http://localhost:5173` in your default browser!
-
-### Method 2: Command Line (From any terminal)
-```powershell
-# In frontend directory:
-cd frontend
-npm run dev
-# Then open http://localhost:5173
-```
-
-### Method 3: Standalone Zero-Server Canvas (No Node.js needed)
-```powershell
-python -m astra ui --canvas
-# Or:
-python -m astra --graph
-```
 
 ---
 
@@ -146,32 +125,15 @@ python -m astra --graph
 | **Court-Admissible Hash Chain** | **Sec 65B / BSA 2023 SHA-256 Ledger** | PDF Report | Hash Export | PDF Report | ❌ |
 | **Autonomous 24x7 Stream Ingestion** | **6-Stage Streaming Pipeline** | Ingestion Engine | Ledger Feed | Web Scrapers | Cron only |
 | **Central Interactive Force Graph** | **Yes (D3/Canvas Force Network)** | Basic Graph | Transaction Tree | Entity Map | Static HTML |
-| **Deployment Overhead** | **Zero (Local PC / Docker Compose)** | Proprietary Cloud | Proprietary Cloud | Enterprise SaaS | Complex setup |
+| **Deployment Overhead** | **Zero (100% Client-Side Web Workstation / Vercel Cloud)** | Proprietary Cloud | Proprietary Cloud | Enterprise SaaS | Complex setup |
 | **Annual Licensing Cost** | **100% Free / FOSS (Team BISHOP)** | ₹25L – ₹50L/yr | ₹20L – ₹40L/yr | ₹35L – ₹60L/yr | Free |
 
 ---
 
-## 💻 Full CLI Command Reference
-
-| Command | Purpose |
-| :--- | :--- |
-| `astra ui` | Launch central interactive forensic investigation canvas directly in default browser |
-| `astra pipeline` | Run end-to-end multi-persona attribution pipeline with UTXO clustering |
-| `astra demo` | Execute controlled SIH 2026 judge presentation de-anonymization walkthrough |
-| `astra personas` | Display inventory of tracked darknet marketplace vendor personas |
-| `astra scan <onion_url>` | Probe target .onion for JARM, TLS SAN leaks, and Favicon MMH3 |
-| `astra trace <wallet_addr>` | Trace blockchain transactions for pre-mixer micro-TX rituals and breathing intervals |
-| `astra stylometry <f1> <f2>` | Compare two text samples with Burrows' Delta z-score computational stylometry |
-| `astra classify "<text>"` | Categorize listing into LEA crime heads (Carding, PII leaks, Ransomware, etc.) |
-| `astra correlate --demo` | Execute 4-pillar DACS fusion and export court dossier & STIX 2.1 |
-| `astra graph --open` | Generate central force-directed network graph and open in browser |
-| `astra verify-chain` | Audit Section 65B BSA 2023 cryptographic hash-chain integrity |
-
----
 
 ## ⚖️ Legal & Evidentiary Compliance
 Project ASTRA complies with **Section 65B of the Indian Evidence Act** and **Bharatiya Sakshya Adhiniyam (BSA) 2023**. Every piece of scraped text, TLS handshake signature, and transaction record is:
 1. Hashed with SHA-256 upon ingestion.
 2. Forward-linked in an append-only cryptographic ledger (`data/evidence_ledger.jsonl`).
-3. Verifiable at any time via `astra verify-chain`.
+3. Verifiable at any time via the cryptographic tamper-evident audit badge in the web workstation.
 4. Certified with an electronic evidence certificate for submission in court.
