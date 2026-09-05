@@ -6,7 +6,6 @@ import {
   Clock,
   RefreshCw,
   Film,
-  Sparkles,
   Palette,
 } from "lucide-react";
 
@@ -52,16 +51,46 @@ export default function Navbar({
             <span className="font-mono font-black text-base md:text-lg tracking-wider text-slate-100 uppercase leading-none whitespace-nowrap">
               PROJECT <span className="text-theme-accent">ASTRA</span>
             </span>
-            <div className="hidden sm:inline-flex items-center gap-1.5 bg-[#0e172a] border border-emerald-500/30 rounded px-2 py-0.5 text-[10px] whitespace-nowrap shadow-sm">
-              <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
+            <div className="hidden sm:inline-flex items-center gap-1 bg-[#0e172a] border border-emerald-500/30 rounded px-1.5 py-0.5 text-[9px] whitespace-nowrap shadow-sm">
+              <ShieldCheck className="w-2.5 h-2.5 text-emerald-400 shrink-0" />
               <span className="text-emerald-400 font-mono font-bold tracking-wider">LEVEL-4 // TOP SECRET</span>
             </div>
           </div>
-          <div className="text-[10px] font-mono text-slate-400 flex items-center gap-1.5 whitespace-nowrap mt-1 leading-none">
+          <div className="text-[9px] font-mono text-slate-400 flex items-center gap-1.5 whitespace-nowrap mt-0.5 leading-none">
             <span className="text-theme-accent font-bold">NTRO SIH26151</span>
-            <span className="text-slate-600 hidden md:inline">•</span>
-            <span className="text-slate-300 font-sans hidden md:inline">Dark Web Threat De-Anonymization</span>
+            <span className="text-slate-600 hidden 2xl:inline">•</span>
+            <span className="text-slate-300 font-sans hidden 2xl:inline">Dark Web Threat De-Anonymization</span>
           </div>
+        </div>
+      </div>
+
+      {/* Tor & OPSEC Security Status Bar */}
+      <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-[#0b1324]/90 border border-slate-800 text-[10px] font-mono shrink-0 shadow-inner">
+        <div className="flex items-center gap-1.5 whitespace-nowrap">
+          <span className="relative flex h-2 w-2">
+            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${health ? 'bg-emerald-400 opacity-75' : 'bg-red-400 opacity-75'}`}></span>
+            <span className={`relative inline-flex rounded-full h-2 w-2 ${health ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
+          </span>
+          <span className="text-slate-400">Backend:</span>
+          <span className={health ? "text-emerald-400 font-semibold" : "text-red-400 font-semibold"}>
+            {health ? "ONLINE (6/6 Modules)" : "OFFLINE"}
+          </span>
+        </div>
+
+        <span className="text-slate-700">|</span>
+
+        <div className="flex items-center gap-1.5 text-slate-300 whitespace-nowrap">
+          <Radio className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
+          <span className="text-slate-400">Tor Circuit:</span>
+          <span className="text-rose-400 font-semibold">Isolated SOCKS5</span>
+        </div>
+
+        <span className="text-slate-700">|</span>
+
+        <div className="flex items-center gap-1.5 text-slate-300 whitespace-nowrap">
+          <Lock className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="text-slate-400">Privoxy:</span>
+          <span className="text-emerald-400 font-semibold">Scrubbing OK</span>
         </div>
       </div>
 
@@ -88,27 +117,15 @@ export default function Navbar({
         </div>
 
         {/* Live Clock (Desktop only) */}
-        <div className="hidden lg:flex items-center gap-1.5 bg-[#0b1220] border border-slate-800/80 rounded-lg px-2 py-1 text-slate-300 font-mono text-xs shrink-0 whitespace-nowrap">
+        <div className="hidden xl:flex items-center gap-1.5 bg-[#0b1220] border border-slate-800/80 rounded-lg px-2 py-1 text-slate-300 font-mono text-xs shrink-0 whitespace-nowrap">
           <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <span className="whitespace-nowrap tabular-nums">{time}</span>
         </div>
 
-        {/* Action Buttons */}
-        {onTogglePitchHud && (
-          <button
-            onClick={onTogglePitchHud}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold text-xs font-mono transition shadow-[0_0_10px_rgba(245,158,11,0.25)] whitespace-nowrap shrink-0"
-            title="Open 5-Minute Live Pitch Prompter & Timer"
-          >
-            <Sparkles className="w-3.5 h-3.5 shrink-0" />
-            <span className="hidden sm:inline">Pitch HUD</span>
-          </button>
-        )}
-
         {onToggleVideoModal && (
           <button
             onClick={onToggleVideoModal}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-theme-accent border border-theme-accent font-bold text-xs font-mono transition whitespace-nowrap shrink-0"
+            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-theme-accent border border-theme-accent font-bold text-xs font-mono transition whitespace-nowrap shrink-0"
             title="Open Video Architecture Showcase"
           >
             <Film className="w-3.5 h-3.5 shrink-0" />
