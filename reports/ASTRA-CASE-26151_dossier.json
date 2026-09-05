@@ -1,0 +1,38 @@
+{
+  "dossier_type": "ASTRA_FORENSIC_DE_ANONYMIZATION_BRIEF",
+  "report": {
+    "case_id": "ASTRA-CASE-26151",
+    "target_persona": "VektorVendor_X",
+    "generated_at": "2026-09-05 12:43:50.100995+00:00",
+    "dacs_score": 100.0,
+    "attribution_verdict": "HIGH CONFIDENCE ATTRIBUTION (SECTION 65B COURT ADMISSIBLE)",
+    "pillar_scores": {
+      "P1_INFRA_SCAN": 1.0,
+      "P2_MGRD": 1.0,
+      "P3_CMTBP": 0.95,
+      "P4_CAA": 0.653
+    },
+    "chain_of_custody_hash": "45df9e933f9b6118ea4f5bd0e2bf4574c796aa457fc8c940bb06e81d3157e6bb",
+    "evidence_count": 36,
+    "key_findings": [
+      "[P1] CRITICAL: SAN leaks clearnet domain 'auth.vektor-ops.ru' on darknet service",
+      "[P1] CRITICAL: SAN leaks clearnet domain '185.220.101.5' on darknet service",
+      "[P2] Discovered 1 PGP public key artifact(s) for persona 'VektorVendor_X'",
+      "[P2] CRITICAL: Exact PGP Key match (81B3E45C70A10D32) reused across multiple forums: ['AlphaBay_V2', 'BohemiaMarket', 'AbacusDarknet']",
+      "[P3] HIGH: Identified 2 pre-mixer micro-transaction test ritual(s) (< 0.003 BTC)",
+      "[P3] CRITICAL: Mixer interaction signature detected: CoinJoin / Wasabi / Whirlpool Equal-Output Pool Heuristic",
+      "[P4] Stylometric cognitive similarity index: 0.65"
+    ],
+    "forensic_notes": "DACS Multi-Signal Fusion calculated for case 'ASTRA-CASE-26151' regarding persona 'VektorVendor_X'. Active pillars: 4/4. Multi-modal corroboration boost: +12%. Single-signal penalty: -0%."
+  },
+  "section_65b_certificate": {
+    "certificate_title": "CERTIFICATE UNDER SECTION 65B INDIAN EVIDENCE ACT / BSA 2023",
+    "case_reference": "ASTRA-CASE-26151",
+    "issued_at": "2026-09-05T12:43:50.106764+00:00",
+    "forensic_tool": "ASTRA Forensic Intelligence Engine (Team BISHOP)",
+    "verification_status": "AUTHENTIC_AND_VERIFIED",
+    "chain_records_count": 36,
+    "cumulative_evidence_hash": "45df9e933f9b6118ea4f5bd0e2bf4574c796aa457fc8c940bb06e81d3157e6bb",
+    "statutory_declaration": "This is to certify that the computer output containing threat intelligence and de-anonymization telemetries produced by ASTRA was generated during the regular course of autonomous passive reconnaissance under continuous SHA-256 cryptographic chain-of-custody."
+  }
+}

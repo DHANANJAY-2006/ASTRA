@@ -18,10 +18,11 @@ venv.bak/
 .coverage
 htmlcov/
 
-# Logs & Databases
+# Logs & Databases & Local runtime evidence
 *.log
 *.sqlite3
 *.db
+data/*.jsonl
 
 # OS / Editor files
 .DS_Store

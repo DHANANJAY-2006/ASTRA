@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  # Tor SOCKS5 Stealth Ingestion Proxy
+  tor-proxy:
+    image: dperson/torproxy:latest
+    container_name: astra-tor-proxy
+    restart: unless-stopped
+    ports:
+      - "9050:9050"
+    environment:
+      - TOR_NewCircuitPeriod=30
+    networks:
+      - astra-net
+
+  # ASTRA Forensic Intelligence Engine / CLI
+  astra-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: astra-forensics
+    restart: "no"
+    depends_on:
+      - tor-proxy
+    environment:
+      - ASTRA_TOR_PROXY=socks5://tor-proxy:9050
+      - ASTRA_DATA_DIR=/app/data
+      - ASTRA_REPORTS_DIR=/app/reports
+    volumes:
+      - astra-data:/app/data
+      - astra-reports:/app/reports
+    networks:
+      - astra-net
+    command: ["correlate", "--demo"]
+
+networks:
+  astra-net:
+    driver: bridge
+
+volumes:
+  astra-data:
+    driver: local
+  astra-reports:
+    driver: local
