@@ -37,6 +37,8 @@ class InfraScanResult(BaseModel):
     ssl_san_list: List[str] = Field(default_factory=list)
     open_ports: List[int] = Field(default_factory=list)
     leaked_clearnet_ips: List[str] = Field(default_factory=list)
+    favicon_mmh3_hash: Optional[str] = None
+    http_banner: Optional[str] = None
     confidence_score: float = Field(ge=0.0, le=1.0)
     indicators: List[str] = Field(default_factory=list)
 
@@ -65,6 +67,7 @@ class CaaResult(BaseModel):
     avg_sentence_length: float = 0.0
     punctuation_signature: Dict[str, float] = Field(default_factory=dict)
     cognitive_marker_matches: List[str] = Field(default_factory=list)
+    burrows_delta_distance: Optional[float] = None
     author_similarity_score: float = Field(ge=0.0, le=1.0)
     confidence_score: float = Field(ge=0.0, le=1.0)
 

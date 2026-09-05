@@ -360,5 +360,88 @@ def verify_chain_cmd():
         ))
         raise typer.Exit(code=1)
 
+@app.command("ui")
+def ui_cmd(
+    host: str = typer.Option("127.0.0.1", "--host", "-h", help="Host interface"),
+    port: int = typer.Option(8000, "--port", "-p", help="Port number"),
+    no_open: bool = typer.Option(False, "--no-open", help="Do not automatically open browser")
+):
+    print_banner()
+    console.print(f"[bold cyan]Launching Project ASTRA Forensic Analyst Workstation...[/bold cyan]")
+    console.print(f"[bold white]API Server URL:[/bold white] [cyan]http://{host}:{port}[/cyan]")
+    console.print(f"[bold white]Interactive Docs:[/bold white] [cyan]http://{host}:{port}/docs[/cyan]")
+
+    if not no_open:
+        webbrowser.open(f"http://{host}:{port}/")
+
+    import uvicorn
+    uvicorn.run("astra.server.app:app", host=host, port=port, reload=False)
+
+@app.command("pipeline")
+def pipeline_cmd():
+    print_banner()
+    console.print("[bold cyan]Executing Multi-Persona Darknet Attribution Pipeline...[/bold cyan]")
+    from astra.services.attribution_pipeline import attribution_pipeline
+    with Progress(TextColumn("[progress.description]{task.description}"), console=console) as progress:
+        task = progress.add_task("[cyan]Ingesting personas, clustering UTXO wallets, and fusing DACS signals...", total=None)
+        actors = attribution_pipeline.run_attribution()
+        progress.update(task, completed=True)
+
+    table = Table(title="ATTRIBUTED THREAT ACTORS", box=box.ROUNDED, border_style="green")
+    table.add_column("Actor ID", style="bold yellow")
+    table.add_column("Primary Alias", style="bold white")
+    table.add_column("Linked Aliases", style="cyan")
+    table.add_column("DACS Score", style="bold green")
+    table.add_column("Verdict", style="bold")
+
+    for a in actors:
+        table.add_row(
+            a.actor_id,
+            a.primary_alias,
+            ", ".join(al["username"] for al in a.aliases),
+            f"{a.dacs_score:.1f}%",
+            f"[green]{a.attribution_verdict}[/green]" if a.dacs_score >= 80 else f"[yellow]{a.attribution_verdict}[/yellow]"
+        )
+    console.print(table)
+
+@app.command("demo")
+def demo_cmd():
+    print_banner()
+    console.print("[bold cyan]Running SIH 2026 Controlled De-Anonymization Demonstration...[/bold cyan]")
+    from astra.server.routes.demo import execute_demo_run
+    res = execute_demo_run()
+    console.print(Panel(
+        f"[bold green]DEMO PIPELINE STATUS: {res['status']}[/bold green]\n\n"
+        f"[bold white]Target Actor ID:[/bold white] {res['actor_id']}\n"
+        f"[bold white]Primary Alias:[/bold white] {res['primary_alias']}\n"
+        f"[bold white]De-Anonymized Aliases:[/bold white] {', '.join(res['linked_aliases'])}\n"
+        f"[bold white]DACS Confidence Score:[/bold white] [bold green]{res['dacs_score']}%[/bold green]\n"
+        f"[bold white]Attribution Verdict:[/bold white] {res['verdict']}\n"
+        f"[bold white]Section 65B Hash Chain Seal:[/bold white] [dim]{res['section_65b_hash']}[/dim]",
+        title="[bold]Judge Demonstration Result[/bold]",
+        border_style="green"
+    ))
+
+@app.command("personas")
+def personas_cmd():
+    print_banner()
+    from astra.services.attribution_pipeline import attribution_pipeline
+    personas = attribution_pipeline.load_personas()
+    table = Table(title="Darknet Tracked Personas", box=box.ROUNDED, border_style="cyan")
+    table.add_column("Username", style="bold white")
+    table.add_column("Marketplace / Forum", style="yellow")
+    table.add_column("Wallet Address", style="dim")
+    table.add_column("PGP Key", style="dim")
+
+    for p in personas:
+        table.add_row(
+            p.username,
+            p.platform,
+            (p.wallet[:14] + "...") if p.wallet else "N/A",
+            (p.pgp_key[:12] + "...") if p.pgp_key else "N/A"
+        )
+    console.print(table)
+
 if __name__ == "__main__":
     app()
+

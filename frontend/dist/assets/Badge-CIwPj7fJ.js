@@ -1,0 +1,1 @@
+import{j as o}from"./index-C1jTRaHU.js";const s={live:"Live Source",historical:"Historical Source",synthetic:"Synthetic / Controlled"};function r({variant:e,label:t}){return o.jsx("span",{className:`badge badge-${e}`,children:t??s[e]})}export{r as B};

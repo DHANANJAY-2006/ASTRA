@@ -1,0 +1,52 @@
+[
+  {
+    "username": "vektor_ops",
+    "platform": "AlphaBay_V2",
+    "sample_text": "Guaranteed delivery strictly via stealth drops!! Do not ask for escrow bypass without PGP. Opsec is undeniable: always verify our signed pgp proof before releasing funds. Never compromise operational security under any circumstances.",
+    "wallet": "bc1q9v8t3z4x7p2m6k8h1n0s5d3f7j9a2c4e6g8w",
+    "pgp_key": "92F4 81B3 E45C 70A1 0D32",
+    "onion_address": "vektor7darkops3xyz.onion",
+    "email": "vektor_support@exploit.im",
+    "vouched_by": ["alpha_buyer_01", "shadow_broker"]
+  },
+  {
+    "username": "krypton_vendor",
+    "platform": "BohemiaMarket",
+    "sample_text": "Always verify our signed pgp proof before releasing funds!! Strictly escrow protected. Never compromise opsec, guaranteed stealth drops across all delivery regions. Do not message on clearnet channels without encryption.",
+    "wallet": "bc1q9v8t3z4x7p2m6k8h1n0s5d3f7j9a2c4e6g8w",
+    "pgp_key": "92F4 81B3 E45C 70A1 0D32",
+    "onion_address": "krypton5store2abc.onion",
+    "email": "krypton_dispatch@protonmail.com",
+    "vouched_by": ["alpha_buyer_01"]
+  },
+  {
+    "username": "phantom_broker",
+    "platform": "AbacusDarknet",
+    "sample_text": "High volume wholesale databases and access credentials. Contact only via tox or jabber with pgp key attached. Escrow mandatory for orders above 2 BTC. No refunds on unverified credentials.",
+    "wallet": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+    "pgp_key": "4A19 C820 1B0F 67E3 89A2",
+    "onion_address": "phantom9broker4market.onion",
+    "email": "phantom_broker@countermail.com",
+    "vouched_by": []
+  },
+  {
+    "username": "cerberus_leaks",
+    "platform": "DreadForum",
+    "sample_text": "Fresh corporate exfiltration dump available. Full financial records, PII, executive emails, and internal git repositories. Bids accepted in Monero or Bitcoin via multisig escrow.",
+    "wallet": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+    "pgp_key": "71C2 94D8 E150 2A33 60B1",
+    "onion_address": "cerberus8leaksnode.onion",
+    "email": "cerberus_intel@secmail.pro",
+    "vouched_by": []
+  },
+  {
+    "username": "nexus_distro",
+    "platform": "BohemiaMarket",
+    "sample_text": "Hardware drops and specialized networking equipment. Vacuum sealed stealth packaging. Delivery guaranteed within 5 business days across domestic routes. PGP signature required for order confirmation.",
+    "wallet": "bc1q9v8t3z4x7p2m6k8h1n0s5d3f7j9a2c4e6g8w_change",
+    "pgp_key": "92F4 81B3 E45C 70A1 0D32",
+    "onion_address": "nexus4supplies8tor.onion",
+    "email": "nexus_ops@onionmail.org",
+    "vouched_by": ["krypton_vendor"]
+  }
+]

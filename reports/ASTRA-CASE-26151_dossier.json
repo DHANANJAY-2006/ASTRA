@@ -3,36 +3,36 @@
   "report": {
     "case_id": "ASTRA-CASE-26151",
     "target_persona": "VektorVendor_X",
-    "generated_at": "2026-09-05 13:21:11.194477+00:00",
+    "generated_at": "2026-09-05 14:18:13.292996+00:00",
     "dacs_score": 100.0,
     "attribution_verdict": "HIGH CONFIDENCE ATTRIBUTION (SECTION 65B COURT ADMISSIBLE)",
     "pillar_scores": {
       "P1_INFRA_SCAN": 1.0,
       "P2_MGRD": 1.0,
       "P3_CMTBP": 0.95,
-      "P4_CAA": 0.653
+      "P4_CAA": 0.625
     },
-    "chain_of_custody_hash": "c69ff33ea5421f2f3bf485bf657d3302d109e79a5d68cb574f73927bad8e90af",
-    "evidence_count": 50,
+    "chain_of_custody_hash": "69f4e6c14f97e6027a5c93ab7a69726aa3c0346ff5080b293cd5c06e2bdf279e",
+    "evidence_count": 648,
     "key_findings": [
       "[P1] CRITICAL: SAN leaks clearnet domain 'auth.vektor-ops.ru' on darknet service",
       "[P1] CRITICAL: SAN leaks clearnet domain '185.220.101.5' on darknet service",
       "[P2] Discovered 1 PGP public key artifact(s) for persona 'VektorVendor_X'",
       "[P2] CRITICAL: Exact PGP Key match (81B3E45C70A10D32) reused across multiple forums: ['AlphaBay_V2', 'BohemiaMarket', 'AbacusDarknet']",
-      "[P3] HIGH: Identified 2 pre-mixer micro-transaction test ritual(s) (< 0.003 BTC)",
-      "[P3] CRITICAL: Mixer interaction signature detected: CoinJoin / Wasabi / Whirlpool Equal-Output Pool Heuristic",
-      "[P4] Stylometric cognitive similarity index: 0.65"
+      "[P3] HIGH: 2 pre-mixer micro-transaction test ritual(s) detected (<0.003 BTC)",
+      "[P3] CRITICAL: Mixer interaction detected: CoinJoin / Wasabi / Whirlpool Heuristic Signature",
+      "[P4] Stylometric cognitive similarity index: 0.62"
     ],
     "forensic_notes": "Case ASTRA-CASE-26151 for persona VektorVendor_X. Pillars active: 4/4. Corroboration boost: +12%. Sparse penalty: -0%."
   },
   "section_65b_certificate": {
     "certificate_title": "CERTIFICATE UNDER SECTION 65B INDIAN EVIDENCE ACT / BSA 2023",
     "case_reference": "ASTRA-CASE-26151",
-    "issued_at": "2026-09-05T13:21:11.198477+00:00",
+    "issued_at": "2026-09-05T14:18:13.302871+00:00",
     "forensic_tool": "ASTRA Forensic Intelligence Engine",
     "verification_status": "AUTHENTIC_AND_VERIFIED",
-    "chain_records_count": 50,
-    "cumulative_evidence_hash": "c69ff33ea5421f2f3bf485bf657d3302d109e79a5d68cb574f73927bad8e90af",
+    "chain_records_count": 648,
+    "cumulative_evidence_hash": "69f4e6c14f97e6027a5c93ab7a69726aa3c0346ff5080b293cd5c06e2bdf279e",
     "statutory_declaration": "This is to certify that the computer output containing threat intelligence and de-anonymization telemetries produced by ASTRA was generated during the regular course of autonomous passive reconnaissance under continuous SHA-256 cryptographic chain-of-custody."
   }
 }

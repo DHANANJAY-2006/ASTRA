@@ -1,0 +1,26 @@
+[
+  {
+    "email": "vektor_support@exploit.im",
+    "breaches": ["ExploitIn_2020", "AntiPublic_Combo", "Collection1"],
+    "suspect_real_name": "Valery Korolenko",
+    "associated_clearnet_domain": "vektor-ops.ru",
+    "country": "RU",
+    "asn": "AS49981"
+  },
+  {
+    "email": "krypton_dispatch@protonmail.com",
+    "breaches": ["DarkMarket_Leak_2021"],
+    "suspect_real_name": null,
+    "associated_clearnet_domain": "krypton-labs.cc",
+    "country": "NL",
+    "asn": "AS60781"
+  },
+  {
+    "email": "phantom_broker@countermail.com",
+    "breaches": ["RaidForums_2022", "Breached_2023"],
+    "suspect_real_name": "Dmitri Volkov",
+    "associated_clearnet_domain": "broker-solutions.org",
+    "country": "EE",
+    "asn": "AS32489"
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "forum_name": "AlphaBay_V2",
+    "onion_url": "pwoah7foa6au2pulvdq2i32ncsxnd7i5hh7nnyq3e2ppmrqxvd26vfad.onion",
+    "status": "SEIZED",
+    "seizure_date": "2024-06-15T04:00:00Z",
+    "seizure_agency": "FBI / Europol / Joint Cyber Action Taskforce",
+    "total_vendors": 4820,
+    "primary_currencies": ["BTC", "XMR"]
+  },
+  {
+    "forum_name": "BohemiaMarket",
+    "onion_url": "bohemiadarknetmarket7x9a.onion",
+    "status": "ACTIVE_MIGRATION",
+    "seizure_date": null,
+    "seizure_agency": null,
+    "total_vendors": 3150,
+    "primary_currencies": ["BTC", "XMR"]
+  },
+  {
+    "forum_name": "AbacusDarknet",
+    "onion_url": "abacusmarket9xyz2tor.onion",
+    "status": "ACTIVE",
+    "seizure_date": null,
+    "seizure_agency": null,
+    "total_vendors": 1940,
+    "primary_currencies": ["BTC", "XMR", "USDT"]
+  },
+  {
+    "forum_name": "DreadForum",
+    "onion_url": "dreadforumsub7xyz2.onion",
+    "status": "ACTIVE",
+    "seizure_date": null,
+    "seizure_agency": null,
+    "total_vendors": 12800,
+    "primary_currencies": []
+  }
+]

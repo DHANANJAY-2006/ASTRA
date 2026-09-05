@@ -7,7 +7,7 @@
 ### Case Information
 - **Case Reference ID**: `ASTRA-CASE-26151`
 - **Target Persona**: `VektorVendor_X`
-- **Generated At**: `2026-09-05T13:21:11.194477+00:00`
+- **Generated At**: `2026-09-05T14:18:13.292996+00:00`
 - **DACS Attribution Confidence**: **`100.0%`**
 - **Verdict**: **`HIGH CONFIDENCE ATTRIBUTION (SECTION 65B COURT ADMISSIBLE)`**
 
@@ -19,7 +19,7 @@
 | **P1: INFRA-SCAN** | Tor Misconfiguration & JARM Recon | `1.00` |
 | **P2: MGRD** | Marketplace Ghost Residue & PGP Correlation | `1.00` |
 | **P3: CMTBP** | Crypto UTXO & Pre-Mixer Testing Rituals | `0.95` |
-| **P4: CAA** | Cognitive Argument Stylometry | `0.65` |
+| **P4: CAA** | Cognitive Argument Stylometry | `0.62` |
 
 ---
 
@@ -28,16 +28,16 @@
 - [P1] CRITICAL: SAN leaks clearnet domain '185.220.101.5' on darknet service
 - [P2] Discovered 1 PGP public key artifact(s) for persona 'VektorVendor_X'
 - [P2] CRITICAL: Exact PGP Key match (81B3E45C70A10D32) reused across multiple forums: ['AlphaBay_V2', 'BohemiaMarket', 'AbacusDarknet']
-- [P3] HIGH: Identified 2 pre-mixer micro-transaction test ritual(s) (< 0.003 BTC)
-- [P3] CRITICAL: Mixer interaction signature detected: CoinJoin / Wasabi / Whirlpool Equal-Output Pool Heuristic
-- [P4] Stylometric cognitive similarity index: 0.65
+- [P3] HIGH: 2 pre-mixer micro-transaction test ritual(s) detected (<0.003 BTC)
+- [P3] CRITICAL: Mixer interaction detected: CoinJoin / Wasabi / Whirlpool Heuristic Signature
+- [P4] Stylometric cognitive similarity index: 0.62
 
 ---
 
 ### Section 65B Indian Evidence Act / BSA 2023 Verification
 - **Status**: `AUTHENTIC_AND_VERIFIED`
-- **Cumulative SHA-256 Chain Anchor**: `c69ff33ea5421f2f3bf485bf657d3302d109e79a5d68cb574f73927bad8e90af`
-- **Evidence Blocks Verified**: `50`
+- **Cumulative SHA-256 Chain Anchor**: `69f4e6c14f97e6027a5c93ab7a69726aa3c0346ff5080b293cd5c06e2bdf279e`
+- **Evidence Blocks Verified**: `648`
 - **Statutory Declaration**:  
   > *"This is to certify that the computer output containing threat intelligence and de-anonymization telemetries produced by ASTRA was generated during the regular course of autonomous passive reconnaissance under continuous SHA-256 cryptographic chain-of-custody."*
 

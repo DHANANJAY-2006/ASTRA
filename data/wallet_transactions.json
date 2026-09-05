@@ -1,0 +1,59 @@
+[
+  {
+    "tx_id": "tx_astra_01",
+    "inputs": [
+      "bc1q9v8t3z4x7p2m6k8h1n0s5d3f7j9a2c4e6g8w",
+      "bc1q9v8t3z4x7p2m6k8h1n0s5d3f7j9a2c4e6g8w_change"
+    ],
+    "outputs": [
+      {"address": "bc1qwasabi_mixer_pool_inlet_001", "amount": 6.200},
+      {"address": "bc1qchange_residual_return_99", "amount": 0.150}
+    ],
+    "timestamp": 1741162000,
+    "is_coinjoin": true
+  },
+  {
+    "tx_id": "tx_astra_pre_test_01",
+    "inputs": [
+      "bc1q9v8t3z4x7p2m6k8h1n0s5d3f7j9a2c4e6g8w"
+    ],
+    "outputs": [
+      {"address": "bc1qwasabi_mixer_pool_inlet_001", "amount": 0.0008}
+    ],
+    "timestamp": 1741160000,
+    "is_coinjoin": false
+  },
+  {
+    "tx_id": "tx_astra_02",
+    "inputs": [
+      "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"
+    ],
+    "outputs": [
+      {"address": "bc1qwhirlpool_deposit_002", "amount": 2.500}
+    ],
+    "timestamp": 1741180000,
+    "is_coinjoin": true
+  },
+  {
+    "tx_id": "tx_astra_pre_test_02",
+    "inputs": [
+      "bc1q9v8t3z4x7p2m6k8h1n0s5d3f7j9a2c4e6g8w_change"
+    ],
+    "outputs": [
+      {"address": "bc1qwasabi_mixer_pool_inlet_001", "amount": 0.0005}
+    ],
+    "timestamp": 1741198000,
+    "is_coinjoin": false
+  },
+  {
+    "tx_id": "tx_astra_03",
+    "inputs": [
+      "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+    ],
+    "outputs": [
+      {"address": "3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy", "amount": 10.0}
+    ],
+    "timestamp": 1741210000,
+    "is_coinjoin": false
+  }
+]

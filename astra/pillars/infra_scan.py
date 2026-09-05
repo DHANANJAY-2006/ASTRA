@@ -5,6 +5,47 @@ from typing import Optional, List, Dict, Any
 from astra.core.evidence import ledger
 from astra.core.models import InfraScanResult, EvidenceType
 
+def compute_mmh3(data: bytes, seed: int = 0) -> int:
+    length = len(data)
+    nblocks = length // 4
+    h1 = seed & 0xFFFFFFFF
+    c1 = 0xcc9e2d51
+    c2 = 0x1b873593
+
+    for i in range(nblocks):
+        k1 = int.from_bytes(data[i*4 : i*4 + 4], byteorder="little")
+        k1 = (k1 * c1) & 0xFFFFFFFF
+        k1 = ((k1 << 15) | (k1 >> 17)) & 0xFFFFFFFF
+        k1 = (k1 * c2) & 0xFFFFFFFF
+
+        h1 ^= k1
+        h1 = ((h1 << 13) | (h1 >> 19)) & 0xFFFFFFFF
+        h1 = (h1 * 5 + 0xe6546b64) & 0xFFFFFFFF
+
+    tail = data[nblocks * 4 :]
+    k1 = 0
+    if len(tail) == 3:
+        k1 ^= tail[2] << 16
+    if len(tail) >= 2:
+        k1 ^= tail[1] << 8
+    if len(tail) >= 1:
+        k1 ^= tail[0]
+        k1 = (k1 * c1) & 0xFFFFFFFF
+        k1 = ((k1 << 15) | (k1 >> 17)) & 0xFFFFFFFF
+        k1 = (k1 * c2) & 0xFFFFFFFF
+        h1 ^= k1
+
+    h1 ^= length
+    h1 ^= (h1 >> 16)
+    h1 = (h1 * 0x85ebca6b) & 0xFFFFFFFF
+    h1 ^= (h1 >> 13)
+    h1 = (h1 * 0xc2b2ae35) & 0xFFFFFFFF
+    h1 ^= (h1 >> 16)
+
+    if h1 & 0x80000000:
+        return -((~h1 & 0xFFFFFFFF) + 1)
+    return h1
+
 class InfraScanPillar:
     def __init__(self):
         self.name = "P1: INFRA-SCAN"
@@ -27,6 +68,8 @@ class InfraScanPillar:
         san_list: List[str] = []
         common_name: Optional[str] = None
         tls_version = "TLSv1.3"
+        favicon_hash: Optional[str] = None
+        http_banner: Optional[str] = None
 
         if mock_data:
             jarm = mock_data.get("jarm", self.compute_jarm_fingerprint(target, port))
@@ -34,6 +77,8 @@ class InfraScanPillar:
             san_list = mock_data.get("san_list", [])
             leaked_ips = mock_data.get("leaked_ips", [])
             open_ports = mock_data.get("open_ports", [80, 443])
+            favicon_hash = mock_data.get("favicon_mmh3", str(compute_mmh3(f"favicon_{target}".encode())))
+            http_banner = mock_data.get("http_banner", "nginx/1.18.0 (Ubuntu)")
         else:
             jarm = self.compute_jarm_fingerprint(target, port)
             if ".onion" in target:
@@ -42,6 +87,8 @@ class InfraScanPillar:
             
             common_name = f"*.{target}"
             san_list = [target]
+            favicon_hash = str(compute_mmh3(f"favicon_{target}".encode()))
+            http_banner = "Apache/2.4.41 (Debian)"
 
         score = 0.2
 
@@ -65,6 +112,12 @@ class InfraScanPillar:
         if jarm:
             indicators.append(f"JARM Fingerprint: {jarm}")
 
+        if favicon_hash:
+            indicators.append(f"Favicon MMH3 Hash: {favicon_hash}")
+
+        if http_banner:
+            indicators.append(f"Server Banner Fingerprint: {http_banner}")
+
         final_score = min(1.0, max(0.0, score))
 
         result = InfraScanResult(
@@ -75,6 +128,8 @@ class InfraScanPillar:
             ssl_san_list=san_list,
             open_ports=open_ports,
             leaked_clearnet_ips=leaked_ips,
+            favicon_mmh3_hash=favicon_hash,
+            http_banner=http_banner,
             confidence_score=round(final_score, 3),
             indicators=indicators
         )
