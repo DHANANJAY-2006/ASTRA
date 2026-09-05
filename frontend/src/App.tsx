@@ -103,7 +103,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen max-h-screen w-screen overflow-hidden bg-[#070a13] text-slate-200 flex flex-col font-sans select-none">
+    <div className="min-h-screen max-h-screen w-full max-w-full overflow-x-hidden overflow-y-hidden bg-[#070a13] text-slate-200 flex flex-col font-sans select-none">
       {/* EXECUTIVE TOP HEADER */}
       <Navbar
         health={health}
