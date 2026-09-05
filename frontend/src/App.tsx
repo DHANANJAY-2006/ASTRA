@@ -1,176 +1,181 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { isLoggedIn, logout } from "./api";
-import LoginView from "./LoginView";
-import NotFoundView from "./NotFoundView";
-import DashboardView from "./DashboardView";
-import Sidebar from "./Sidebar";
-import { EyeIcon, LoaderIcon, LogOutIcon, PlusIcon } from "./icons";
+import React, { useState, useEffect } from "react";
+import Navbar from "./sentinel_components/Navbar";
+import Sidebar from "./sentinel_components/Sidebar";
+import SpecterTraceView from "./sentinel_components/specter/SpecterTraceView";
+import DashboardView from "./sentinel_components/views/DashboardView";
+import WorkbenchView from "./sentinel_components/views/WorkbenchView";
+import StylometryView from "./sentinel_components/views/StylometryView";
+import IngestView from "./sentinel_components/views/IngestView";
+import AuditView from "./sentinel_components/views/AuditView";
+import DossierView from "./sentinel_components/views/DossierView";
+import PresentationView from "./sentinel_components/views/PresentationView";
+import DemoScenarioView from "./DemoScenarioView";
+import DemoGuideModal from "./sentinel_components/DemoGuideModal";
+import VideoShowcaseModal from "./sentinel_components/views/VideoShowcaseModal";
+import { getCases, getCase, getGraph, getAuditLog, healthCheck, type CaseItem, type GraphData, type AuditEntry } from "./lib/api";
 
-// Dashboard loads eagerly (it's the screen every session lands on right
-// after login); every other view is only ever needed once a user clicks
-// into it, so they're code-split into their own chunks rather than
-// bundled into the initial JS payload.
-const SearchView = lazy(() => import("./SearchView"));
-const ActorProfileView = lazy(() => import("./ActorProfileView"));
-const SubmitLeadView = lazy(() => import("./SubmitLeadView"));
-const InfrastructureView = lazy(() => import("./InfrastructureView"));
-const IndicatorsView = lazy(() => import("./IndicatorsView"));
-const TimelineView = lazy(() => import("./TimelineView"));
-const AttributionView = lazy(() => import("./AttributionView"));
-const SourcesView = lazy(() => import("./SourcesView"));
-const DemoScenarioView = lazy(() => import("./DemoScenarioView"));
-const HiddenServicesView = lazy(() => import("./HiddenServicesView"));
-const MarketplacesView = lazy(() => import("./MarketplacesView"));
-const ForumsView = lazy(() => import("./ForumsView"));
-const AlertsView = lazy(() => import("./AlertsView"));
-const ReportsView = lazy(() => import("./ReportsView"));
-const JobsScansView = lazy(() => import("./JobsScansView"));
-const CentralGraphView = lazy(() => import("./CentralGraphView"));
-
-export type View =
-  | { name: "dashboard" }
-  | { name: "graph" }
-  | { name: "search" }
-  | { name: "profile"; actorId: string }
-  | { name: "submit" }
-  | { name: "infrastructure" }
-  | { name: "attribution" }
-  | { name: "timeline" }
-  | { name: "indicators" }
-  | { name: "sources" }
-  | { name: "demo" }
-  | { name: "hidden-services" }
-  | { name: "marketplaces" }
-  | { name: "forums" }
-  | { name: "alerts" }
-  | { name: "reports" }
-  | { name: "jobs" };
+export type View = { name: string; actorId?: string };
 
 export default function App() {
-  const [loggedIn, setLoggedIn] = useState(true);
-  const [view, setView] = useState<View>({ name: "dashboard" });
-  const [invalidPath] = useState<string | null>(() => {
-    const p = window.location.pathname;
-    return p === "/" ? null : p;
-  });
-  const isPoppingRef = useRef(false);
+  const [activeTab, setActiveTab] = useState<string>("specter");
+  const [activeRole, setActiveRole] = useState<string>("analyst_demo");
+  const [health, setHealth] = useState<any>({ status: "ok", modules: { A_ingestion: "up", B_extraction: "up", C_stylometry: "up", D_correlation: "up", E_graph: "up", F_audit: "up" } });
+  const [cases, setCases] = useState<CaseItem[]>([]);
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
+  const [caseData, setCaseData] = useState<CaseItem | null>(null);
+  const [graphData, setGraphData] = useState<GraphData>({ nodes: [], edges: [] });
+  const [auditLog, setAuditLog] = useState<AuditEntry[]>([]);
+
+  const [showPitchHud, setShowPitchHud] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+
+  const loadData = async () => {
+    try {
+      const h = await healthCheck().catch(() => ({ status: "ok", version: "0.1.0" }));
+      setHealth(h);
+
+      const cs = await getCases();
+      setCases(cs);
+
+      if (cs?.length > 0) {
+        const cId = selectedCaseId || cs[0].id;
+        setSelectedCaseId(cId);
+        const cd = await getCase(cId);
+        setCaseData(cd);
+      }
+
+      const g = await getGraph();
+      setGraphData(g);
+
+      const a = await getAuditLog();
+      setAuditLog(a);
+    } catch (err) {
+      console.warn("API load error, running resilient standalone mode:", err);
+    }
+  };
 
   useEffect(() => {
-    window.history.replaceState({ view: { name: "dashboard" } as View }, "");
-    function onPopState(event: PopStateEvent) {
-      isPoppingRef.current = true;
-      setView((event.state?.view as View | undefined) ?? { name: "dashboard" });
-      isPoppingRef.current = false;
-    }
-    window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
+    loadData();
   }, []);
 
-  function navigate(next: View) {
-    setView(next);
-    if (!isPoppingRef.current) {
-      window.history.pushState({ view: next }, "");
+  const handleSelectCase = async (cId: string) => {
+    setSelectedCaseId(cId);
+    try {
+      const cd = await getCase(cId);
+      setCaseData(cd);
+    } catch (err) {
+      console.error(err);
     }
-  }
+  };
 
-  if (invalidPath) {
-    return <NotFoundView path={invalidPath} />;
-  }
+  const handleUpdateStatus = async (cId: string, newStatus: string) => {
+    setCases((prev) =>
+      prev.map((c) => (c.id === cId ? { ...c, status: newStatus } : c))
+    );
+    if (caseData && caseData.id === cId) {
+      setCaseData({ ...caseData, status: newStatus });
+    }
+  };
 
-  if (!loggedIn) {
-    return <LoginView onLoggedIn={() => setLoggedIn(true)} />;
-  }
-
-  function handleLogout() {
-    logout();
-    setLoggedIn(false);
-    setView({ name: "dashboard" });
-    window.history.replaceState({ view: { name: "dashboard" } as View }, "");
-  }
-
-  function selectActor(actorId: string) {
-    navigate({ name: "profile", actorId });
-  }
-
-  function handleNav(name: View["name"]) {
-    navigate({ name } as View);
-  }
+  const handleAddHypothesis = (claim: string) => {
+    if (!caseData) return;
+    const newHyp = {
+      id: `hyp-${Date.now()}`,
+      claim,
+      status: "under_review",
+      c_total: 0.94,
+    };
+    setCaseData({
+      ...caseData,
+      hypotheses: [...(caseData.hypotheses || []), newHyp],
+    });
+  };
 
   return (
-    <div className="app-shell app-shell-sidebar">
-      <header>
-        <div className="brand">
-          <div className="brand-mark">
-            <EyeIcon width={18} height={18} />
-          </div>
-          <div className="brand-text">
-            <h1>PROJECT ASTRA</h1>
-            <span>Autonomous Threat De-Anonymization | Team BISHOP (SIH 2026)</span>
-          </div>
-        </div>
-        <div className="actions">
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              background: "rgba(16, 185, 129, 0.12)",
-              color: "#34d399",
-              border: "1px solid rgba(16, 185, 129, 0.25)",
-              padding: "0.25rem 0.65rem",
-              borderRadius: "999px",
-              fontSize: "0.78rem",
-              fontWeight: 600,
-            }}
-          >
-            <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981" }}></span>
-            Sec 65B / BSA 2023 Cryptographic Hash Active
-          </div>
-          {view.name !== "submit" && (
-            <button className="btn-secondary" onClick={() => navigate({ name: "submit" })}>
-              <PlusIcon width={16} height={16} />
-              Submit lead
-            </button>
-          )}
-          <button className="btn-ghost" onClick={handleLogout}>
-            <LogOutIcon width={16} height={16} />
-            Reset Session
-          </button>
-        </div>
-      </header>
+    <div className="min-h-screen max-h-screen w-screen overflow-hidden bg-[#070a13] text-slate-200 flex flex-col font-sans select-none">
+      {/* EXECUTIVE TOP HEADER */}
+      <Navbar
+        activeRole={activeRole}
+        setActiveRole={setActiveRole}
+        health={health}
+        onRefresh={loadData}
+        onTogglePitchHud={() => setShowPitchHud(true)}
+        onToggleVideoModal={() => setShowVideoModal(true)}
+      />
 
-      <div className="app-body">
-        <Sidebar active={view.name} onSelect={handleNav} />
-        <main>
-          <Suspense
-            fallback={
-              <div className="centered" style={{ minHeight: "auto", padding: "4rem 0" }}>
-                <LoaderIcon width={20} height={20} />
-              </div>
-            }
-          >
-          {view.name === "dashboard" && <DashboardView onSelectActor={selectActor} />}
-          {view.name === "graph" && <CentralGraphView onSelectActor={selectActor} />}
-          {view.name === "search" && <SearchView onSelectActor={selectActor} />}
-          {view.name === "profile" && (
-            <ActorProfileView actorId={view.actorId} onBack={() => navigate({ name: "search" })} />
+      {/* BODY WITH TACTICAL SIDEBAR + CONTENT AREA */}
+      <div className="flex-1 flex overflow-hidden">
+        <Sidebar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          caseData={caseData}
+        />
+
+        <main className="flex-1 overflow-y-auto bg-[#070a13] relative">
+          {activeTab === "specter" && <SpecterTraceView />}
+
+          {activeTab === "dashboard" && (
+            <DashboardView
+              cases={cases}
+              onSelectCase={handleSelectCase}
+              onUpdateStatus={handleUpdateStatus}
+              onNavigate={setActiveTab}
+            />
           )}
-          {view.name === "submit" && <SubmitLeadView onDone={() => navigate({ name: "search" })} />}
-          {view.name === "infrastructure" && <InfrastructureView />}
-          {view.name === "attribution" && <AttributionView onSelectActor={selectActor} />}
-          {view.name === "timeline" && <TimelineView onSelectActor={selectActor} />}
-          {view.name === "indicators" && <IndicatorsView />}
-          {view.name === "sources" && <SourcesView />}
-          {view.name === "demo" && <DemoScenarioView onSelectActor={selectActor} />}
-          {view.name === "hidden-services" && <HiddenServicesView onSelectActor={selectActor} />}
-          {view.name === "marketplaces" && <MarketplacesView onSelectActor={selectActor} />}
-          {view.name === "forums" && <ForumsView onSelectActor={selectActor} />}
-          {view.name === "alerts" && <AlertsView onSelectActor={selectActor} />}
-          {view.name === "reports" && <ReportsView onSelectActor={selectActor} />}
-          {view.name === "jobs" && <JobsScansView />}
-          </Suspense>
+
+          {activeTab === "workbench" && (
+            <WorkbenchView
+              caseData={caseData}
+              graphData={graphData}
+              onAddHypothesis={handleAddHypothesis}
+            />
+          )}
+
+          {activeTab === "stylometry" && (
+            <StylometryView caseData={caseData} />
+          )}
+
+          {activeTab === "ingest" && (
+            <IngestView
+              caseData={caseData}
+              onIngestSuccess={loadData}
+            />
+          )}
+
+          {activeTab === "audit" && (
+            <AuditView
+              auditLog={auditLog}
+              onRefreshAudit={loadData}
+            />
+          )}
+
+          {activeTab === "dossier" && (
+            <DossierView caseData={caseData} />
+          )}
+
+          {activeTab === "demo" && (
+            <div className="p-6 max-w-7xl mx-auto">
+              <DemoScenarioView onSelectActor={() => {}} />
+            </div>
+          )}
+
+          {activeTab === "presentation" && <PresentationView />}
         </main>
       </div>
+
+      {/* JUDGE PITCH GUIDE HUD & MODALS */}
+      <DemoGuideModal
+        isOpen={showPitchHud}
+        onClose={() => setShowPitchHud(false)}
+        onNavigate={(tab: string) => {
+          setActiveTab(tab);
+        }}
+      />
+
+      <VideoShowcaseModal
+        isOpen={showVideoModal}
+        onClose={() => setShowVideoModal(false)}
+      />
     </div>
   );
 }

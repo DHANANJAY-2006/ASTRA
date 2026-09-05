@@ -30,11 +30,16 @@
 
 | Presentation Stage | Tab to Open | What to Highlight to Judges |
 | :--- | :--- | :--- |
-| **1. Executive Overview** | **Dashboard** | Active threat actors, 26 de-anonymization edges, Section 65B BSA 2023 tamper-evident ledger validity badge. |
-| **2. Central Force Graph** | **Investigation Graph** | Multi-signal force-directed network linking personas, Bitcoin wallets, Tor hidden services, leaked clearnet IPs, and court hash anchors. Drag, zoom, and filter by entity type. |
-| **3. Live Controlled Demo** | **Controlled Demo** | Click **"Run Controlled De-Anonymization Demo"**. Watch the 6 pipeline stages turn green in real-time as fragmented personas (`vektor_ops` on AlphaBay and `krypton_vendor` on Bohemia) merge into a single attributed actor with 100% DACS confidence. |
-| **4. Deep Actor Dossier** | **Threat Actors** -> `Vektor Syndicate` | Full multi-pillar breakdown: P1 Tor JARM & SAN clearnet leak (`185.220.101.5`), P2 PGP key reuse & 24.5h migration window, P3 pre-mixer micro-TX rituals (<0.001 BTC), and P4 Burrows' Delta stylometry (94.6%). |
-| **5. Court Admissibility** | **Reports** | Download authentic Section 65B Electronic Evidence Certificates and STIX 2.1 JSON intelligence bundles. |
+| **1. SPECTER-TRACE Workbench** | **SPECTER-TRACE** | 4-Zone attribution apparatus: 2D Leaflet multi-hop circuit (Frankfurt -> Amsterdam -> Bucharest VPS origin), central Cytoscape knowledge graph, Stylometry radar, SOCKS5 circuit status, and real-time NTRO correlation stream. |
+| **2. Executive Command** | **SOC Command** | Joint command threat matrix, live cases (`Tracking DarkViper`, `PHANTOM-KRYPT`), DEFCON 2 threat level, and multi-signal alert counters. |
+| **3. Knowledge Graph Engine** | **Knowledge Graph** | Cytoscape interactive pivot engine with **Confidence Threshold Slider (0.0 to 1.0)**, **Historical Growth Time-Slider (Stages 1–5)**, Betweenness Centrality broker mode, and side-by-side darknet vs clearnet diff modal. |
+| **4. AI Stylometry & NLP** | **Stylometry & NLP** | Burrows' Delta computational stylometry, function-word frequency writeprints, circadian timezone sleep-window inference, and cross-platform clearnet correlation search. |
+| **5. Tor Ingestion Hub** | **Tor Ingestion Hub** | Live Tor circuit rotation (`/api/ingest/tor/rotate`), Privoxy header scrubbing, and human-in-the-loop assisted browsing anti-bot CAPTCHA resolution queue. |
+| **6. Section 65B Evidentiary Audit** | **Audit & Custody** | Merkle hash-chain proof. Click **"Simulate Tamper"** to inject an unauthorized block corruption and show judges how the cryptographic verification immediately detects tampering. |
+| **7. 1-Click Court Dossier** | **Court Dossier / Legal Dossier** | 1-Click download of authentic Section 65B Indian Evidence Act / Section 63 BSA 2023 forensic PDF certificate generated client-side in browser. |
+| **8. 10-Slide Pitch Deck** | **Slide Presentation** | High-impact 10-slide hackathon presentation deck built directly into the web application with keyboard shortcuts (`←` `→` / `Space`) and fullscreen mode. |
+| **9. Judge Pitch Guide HUD** | **Header -> Pitch HUD** | Interactive 5-minute pitch script with countdown timer and judge Q&A defense answers. |
+| **10. Live Controlled Demo** | **Controlled Demo** | Automated 6-stage de-anonymization pipeline demonstrating fragmented darknet personas merging into a single deanonymized suspect with 100% confidence. |
 
 
 ---
