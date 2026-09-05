@@ -1,16 +1,30 @@
 """
-SENTINEL-X Exhaustive Function & API Audit Test Suite.
+Project ASTRA: Exhaustive Function & Forensic API Audit Test Suite.
 Tests every function, endpoint, regex, formula, and edge case across all 6 modules.
 """
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+BACKEND_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
+ROOT_DIR = os.path.abspath(os.path.join(BACKEND_DIR, ".."))
+
+for p in [BACKEND_DIR, ROOT_DIR]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 from fastapi.testclient import TestClient
-from app.main import app
-from app.db import SessionLocal
-from app.models import Case, RawDocument as Document, Artifact
+
+try:
+    from app.main import app
+    from app.db import SessionLocal, sync_init_db
+    from app.models import Case, RawDocument as Document, Artifact
+except ImportError:
+    from backend.app.main import app
+    from backend.app.db import SessionLocal, sync_init_db
+    from backend.app.models import Case, RawDocument as Document, Artifact
+
+sync_init_db()
 from app.modules.extraction import (
     extract_artifacts,
     _b58_decode_check,

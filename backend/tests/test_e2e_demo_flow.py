@@ -1,17 +1,31 @@
 """
-SENTINEL-X Phase 6: Automated End-to-End Rehearsal & Smoke Test Suite.
+Project ASTRA: Automated End-to-End Forensic Rehearsal & Smoke Test Suite.
 Validates the entire 5-minute "Tracking DarkViper" demo flow per SIH26151 PRD Section 7.1.
 """
 import sys
 import os
 
-# Add backend to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+BACKEND_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
+ROOT_DIR = os.path.abspath(os.path.join(BACKEND_DIR, ".."))
+
+for p in [BACKEND_DIR, ROOT_DIR]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 from fastapi.testclient import TestClient
-from app.main import app
-from app.db import SessionLocal
-from app.models import Case, RawDocument as Document
+
+try:
+    from app.main import app
+    from app.db import SessionLocal, sync_init_db
+    from app.models import Case, RawDocument as Document
+except ImportError:
+    from backend.app.main import app
+    from backend.app.db import SessionLocal, sync_init_db
+    from backend.app.models import Case, RawDocument as Document
+
+# Ensure SQLite tables exist when run directly
+sync_init_db()
 
 client = TestClient(app)
 
@@ -175,7 +189,7 @@ def test_07_court_admissible_pdf_dossier():
 
 if __name__ == "__main__":
     print("\n" + "=" * 65)
-    print("   SENTINEL-X: PHASE 6 END-TO-END REHEARSAL & SMOKE TEST SUITE")
+    print("   PROJECT ASTRA: PHASE 6 END-TO-END REHEARSAL & SMOKE TEST SUITE")
     print("   SIH26151 - National Technical Research Organisation (NTRO)")
     print("=" * 65 + "\n")
 

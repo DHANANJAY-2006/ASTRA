@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   Radio,
   Lock,
-  UserCheck,
+  ShieldCheck,
   Clock,
   RefreshCw,
   Film,
@@ -11,8 +11,6 @@ import {
 } from "lucide-react";
 
 export default function Navbar({
-  activeRole,
-  setActiveRole,
   health,
   onRefresh,
   onTogglePitchHud,
@@ -31,13 +29,6 @@ export default function Navbar({
     const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
   }, []);
-
-  const ROLES = [
-    { id: "analyst_demo", name: "Priya", title: "Senior Analyst", role: "analyst" },
-    { id: "forensic_demo", name: "Rakesh", title: "Forensic Investigator", role: "investigator" },
-    { id: "soc_lead_demo", name: "Anjali", title: "SOC Lead", role: "soc_lead" },
-    { id: "auditor_demo", name: "Auditor", title: "Compliance Officer", role: "auditor" },
-  ];
 
   const THEMES = [
     { id: "blue", label: "Blue", color: "#00f0ff", bg: "bg-cyan-500" },
@@ -135,21 +126,11 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* Role Selector */}
-        <div className="flex items-center gap-1.5 bg-[#0e172a] border border-slate-800 rounded-lg px-2.5 py-1 text-xs shrink-0 whitespace-nowrap">
-          <UserCheck className="w-3.5 h-3.5 text-theme-accent shrink-0" />
-          <span className="text-slate-400 text-[11px] font-mono hidden md:inline">Role:</span>
-          <select
-            value={activeRole}
-            onChange={(e) => setActiveRole(e.target.value)}
-            className="bg-transparent text-theme-accent font-mono text-xs focus:outline-none cursor-pointer pr-1"
-          >
-            {ROLES.map((r) => (
-              <option key={r.id} value={r.id} className="bg-slate-900 text-slate-200">
-                {r.name} ({r.title})
-              </option>
-            ))}
-          </select>
+        {/* Security Clearance & Classification Badge */}
+        <div className="flex items-center gap-1.5 bg-[#0e172a] border border-slate-800 rounded-lg px-2.5 py-1 text-xs shrink-0 whitespace-nowrap shadow-sm">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+          <span className="text-slate-400 text-[11px] font-mono hidden md:inline">CLEARANCE:</span>
+          <span className="text-theme-accent font-mono font-bold text-xs tracking-wider">LEVEL-4 // TOP SECRET</span>
         </div>
 
         {/* Live Clock */}

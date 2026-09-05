@@ -23,7 +23,6 @@ export default function App() {
     return "blue";
   });
   const [activeTab, setActiveTab] = useState<string>("specter");
-  const [activeRole, setActiveRole] = useState<string>("analyst_demo");
   const [health, setHealth] = useState<any>({ status: "ok", modules: { A_ingestion: "up", B_extraction: "up", C_stylometry: "up", D_correlation: "up", E_graph: "up", F_audit: "up" } });
   const [cases, setCases] = useState<CaseItem[]>([]);
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
@@ -107,8 +106,6 @@ export default function App() {
     <div className="min-h-screen max-h-screen w-screen overflow-hidden bg-[#070a13] text-slate-200 flex flex-col font-sans select-none">
       {/* EXECUTIVE TOP HEADER */}
       <Navbar
-        activeRole={activeRole}
-        setActiveRole={setActiveRole}
         health={health}
         onRefresh={loadData}
         onTogglePitchHud={() => setShowPitchHud(true)}
