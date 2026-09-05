@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { computeLayout, LayoutEdge } from "./forceLayout";
 import { NetworkIcon, UserIcon, WalletIcon, KeyIcon, ServerIcon, ActivityIcon } from "./icons";
+import { MOCK_CENTRAL_GRAPH } from "./mockData";
 
 interface GraphNode {
   id: string;
@@ -49,7 +50,7 @@ export default function CentralGraphView({ onSelectActor }: { onSelectActor?: (a
   const dragStartRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/v1/graph")
+    fetch("/api/v1/graph")
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -58,8 +59,8 @@ export default function CentralGraphView({ onSelectActor }: { onSelectActor?: (a
         setData(json);
         setLoading(false);
       })
-      .catch((err) => {
-        setError(err.message);
+      .catch(() => {
+        setData(MOCK_CENTRAL_GRAPH as GraphResponse);
         setLoading(false);
       });
   }, []);

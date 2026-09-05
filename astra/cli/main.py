@@ -358,8 +358,23 @@ def graph_cmd(
 @app.command("ui")
 def ui_cmd(
     case_id: str = typer.Option("ASTRA-CASE-26151", "--case", "-c", help="Case reference ID"),
-    persona: str = typer.Option("VektorVendor_X", "--persona", "-p", help="Target threat persona")
+    persona: str = typer.Option("VektorVendor_X", "--persona", "-p", help="Target threat persona"),
+    workstation: bool = typer.Option(True, "--workstation/--canvas", help="Launch full React Workstation or Standalone Canvas")
 ):
+    print_banner()
+    frontend_dir = config.project_root / "frontend"
+    if workstation and frontend_dir.exists():
+        import shutil
+        import subprocess
+        npx_cmd = shutil.which("npx.cmd") or shutil.which("npx")
+        if npx_cmd:
+            console.print("[bold cyan]Launching Project ASTRA Interactive Web Workstation on http://localhost:5173...[/bold cyan]")
+            webbrowser.open("http://localhost:5173")
+            try:
+                subprocess.run([npx_cmd, "vite", "--port", "5173"], cwd=str(frontend_dir), check=False)
+                return
+            except Exception:
+                pass
     render_and_open_investigation_graph(case_id, persona, True)
 
 @app.command("pipeline")

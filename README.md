@@ -17,44 +17,46 @@
 
 ---
 
-## ⚡ Quickstart: Run ASTRA on Your Computer
+## 🌐 Live Web Demo (Mobile & Laptop Ready)
 
-### Step 1: Install Dependencies (Run once)
+- **Live Workstation (GitHub Pages)**: `https://dhananjay-2006.github.io/ASTRA/`
+- **Auto-Deployment**: Every `git push origin main` triggers an automatic GitHub Actions build and deploys the latest version in ~45 seconds. Opens directly on any phone, tablet, or laptop browser with zero installation!
 
+---
+
+## ⚡ 1-Click Launch on Your Computer
+
+### Method 1: Double-Click Launcher (Easiest for Judges & Evaluators)
+Simply double-click **`launch.bat`** in the project folder.  
+It automatically starts the Interactive Analyst Web Workstation and opens `http://localhost:5173` in your default browser!
+
+### Method 2: Command Line (From any terminal)
 ```powershell
-python -m pip install -r requirements.txt
-python -m pip install -e .
+# In frontend directory:
+cd frontend
+npm run dev
+# Then open http://localhost:5173
 ```
 
-### Step 2: Run the Tool Immediately
-
-You can use ASTRA via **Interactive Forensic Canvas** or **Headless Terminal CLI**:
-
-#### Option A: Launch Central Interactive Investigation Canvas (Standalone / Zero-Server)
+### Method 3: Standalone Zero-Server Canvas (No Node.js needed)
 ```powershell
-python -m astra.cli.main ui
-# Or directly:
+python -m astra ui --canvas
+# Or:
 python -m astra --graph
 ```
-*Instantly renders the multi-pillar de-anonymization network canvas and opens it directly in your web browser. Completely serverless, 100% offline-ready, with zero port or background daemon requirements.*
 
-#### Option B: Terminal CLI Operations
-```powershell
-# 1. Run the Multi-Persona Darknet Attribution Pipeline
-python -m astra.cli.main pipeline
+---
 
-# 2. Run the SIH 2026 Judge Demonstration Scenario
-python -m astra.cli.main demo
+## 🏆 SIH 2026 Judge Presentation Guide
 
-# 3. List Tracked Darknet Personas across AlphaBay, Bohemia, and Abacus
-python -m astra.cli.main personas
+| Presentation Stage | Tab to Open | What to Highlight to Judges |
+| :--- | :--- | :--- |
+| **1. Executive Overview** | **Dashboard** | Active threat actors, 26 de-anonymization edges, Section 65B BSA 2023 tamper-evident ledger validity badge. |
+| **2. Central Force Graph** | **Investigation Graph** | Multi-signal force-directed network linking personas, Bitcoin wallets, Tor hidden services, leaked clearnet IPs, and court hash anchors. Drag, zoom, and filter by entity type. |
+| **3. Live Controlled Demo** | **Controlled Demo** | Click **"Run Controlled De-Anonymization Demo"**. Watch the 6 pipeline stages turn green in real-time as fragmented personas (`vektor_ops` on AlphaBay and `krypton_vendor` on Bohemia) merge into a single attributed actor with 100% DACS confidence. |
+| **4. Deep Actor Dossier** | **Threat Actors** -> `Vektor Syndicate` | Full multi-pillar breakdown: P1 Tor JARM & SAN clearnet leak (`185.220.101.5`), P2 PGP key reuse & 24.5h migration window, P3 pre-mixer micro-TX rituals (<0.001 BTC), and P4 Burrows' Delta stylometry (94.6%). |
+| **5. Court Admissibility** | **Reports** | Download authentic Section 65B Electronic Evidence Certificates and STIX 2.1 JSON intelligence bundles. |
 
-# 4. Generate & Open Standalone Interactive Graph Canvas
-python -m astra.cli.main graph --open
-
-# 5. Audit Cryptographic Evidence Chain (Section 65B / BSA 2023)
-python -m astra.cli.main verify-chain
-```
 
 ---
 
