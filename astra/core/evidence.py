@@ -3,7 +3,7 @@ import json
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 
 from astra.config import config
 from astra.core.models import EvidenceRecord, EvidenceType
@@ -11,11 +11,6 @@ from astra.core.models import EvidenceRecord, EvidenceType
 GENESIS_HASH = "0000000000000000000000000000000000000000000000000000000000000000"
 
 class EvidenceLedger:
-    """
-    Immutable Cryptographic Hash Chain conforming to Section 65B of the Indian Evidence Act
-    and Bharatiya Sakshya Adhiniyam (BSA), 2023.
-    """
-
     def __init__(self, ledger_file: Optional[Path] = None):
         self.ledger_path = ledger_file or config.evidence_ledger_path
         self.ledger_path.parent.mkdir(parents=True, exist_ok=True)
@@ -23,7 +18,6 @@ class EvidenceLedger:
             self.ledger_path.touch()
 
     def _get_last_block_hash(self) -> str:
-        """Reads the latest block hash from the ledger. Returns GENESIS_HASH if empty."""
         last_hash = GENESIS_HASH
         if self.ledger_path.stat().st_size == 0:
             return last_hash
@@ -45,9 +39,6 @@ class EvidenceLedger:
         raw_bytes: bytes,
         metadata: Optional[Dict[str, Any]] = None
     ) -> EvidenceRecord:
-        """
-        Hashes raw evidentiary data and anchors it into the cryptographic chain of custody.
-        """
         raw_sha256 = hashlib.sha256(raw_bytes).hexdigest()
         byte_size = len(raw_bytes)
         now = datetime.now(timezone.utc)
@@ -55,8 +46,6 @@ class EvidenceLedger:
         evidence_id = f"EV-{uuid.uuid4().hex[:12].upper()}"
 
         parent_hash = self._get_last_block_hash()
-
-        # Cumulative block hash computation: SHA256(parent_hash || raw_sha256 || timestamp || id)
         block_preimage = f"{parent_hash}:{raw_sha256}:{now_iso}:{evidence_id}"
         block_hash = hashlib.sha256(block_preimage.encode("utf-8")).hexdigest()
 
@@ -78,10 +67,6 @@ class EvidenceLedger:
         return record
 
     def verify_chain_integrity(self) -> Dict[str, Any]:
-        """
-        Validates the complete chain of custody from genesis to head.
-        Guarantees that evidence records have not been tampered with, truncated, or modified.
-        """
         if not self.ledger_path.exists() or self.ledger_path.stat().st_size == 0:
             return {
                 "valid": True,
@@ -106,19 +91,17 @@ class EvidenceLedger:
                     return {
                         "valid": False,
                         "broken_at_line": line_no,
-                        "error": f"Corrupt JSON or invalid schema: {str(e)}"
+                        "error": str(e)
                     }
 
-                # Verify parent link
                 if record.parent_hash != expected_parent:
                     return {
                         "valid": False,
                         "broken_at_line": line_no,
                         "evidence_id": record.evidence_id,
-                        "error": f"Broken parent link. Expected {expected_parent}, found {record.parent_hash}"
+                        "error": f"Broken parent link: {expected_parent} != {record.parent_hash}"
                     }
 
-                # Recompute block hash
                 now_iso = record.captured_at.isoformat()
                 block_preimage = f"{record.parent_hash}:{record.raw_sha256}:{now_iso}:{record.evidence_id}"
                 computed_block = hashlib.sha256(block_preimage.encode("utf-8")).hexdigest()
@@ -128,7 +111,7 @@ class EvidenceLedger:
                         "valid": False,
                         "broken_at_line": line_no,
                         "evidence_id": record.evidence_id,
-                        "error": "Block hash mismatch. Data has been tampered with."
+                        "error": "Block hash mismatch. Data has been modified."
                     }
 
                 expected_parent = record.block_hash
@@ -138,13 +121,10 @@ class EvidenceLedger:
             "valid": True,
             "total_records": records_count,
             "latest_block_hash": expected_parent,
-            "message": "Chain of custody verified successfully. All cryptographic anchors intact."
+            "message": "Chain of custody verified successfully."
         }
 
     def generate_section_65b_certificate(self, case_reference: str) -> Dict[str, Any]:
-        """
-        Generates formal legal certificate data for admissibility under Bharatiya Sakshya Adhiniyam, 2023.
-        """
         verification = self.verify_chain_integrity()
         if not verification["valid"]:
             raise ValueError(f"Cannot generate certificate for corrupt ledger: {verification.get('error')}")
@@ -153,7 +133,7 @@ class EvidenceLedger:
             "certificate_title": "CERTIFICATE UNDER SECTION 65B INDIAN EVIDENCE ACT / BSA 2023",
             "case_reference": case_reference,
             "issued_at": datetime.now(timezone.utc).isoformat(),
-            "forensic_tool": f"{config.app_name} (Team BISHOP)",
+            "forensic_tool": config.app_name,
             "verification_status": "AUTHENTIC_AND_VERIFIED",
             "chain_records_count": verification["total_records"],
             "cumulative_evidence_hash": verification["latest_block_hash"],
@@ -164,5 +144,4 @@ class EvidenceLedger:
             )
         }
 
-# Global singleton
 ledger = EvidenceLedger()

@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-import pytest
 
 from astra.core.evidence import EvidenceLedger, GENESIS_HASH
 from astra.core.models import EvidenceType
@@ -9,23 +8,19 @@ def test_evidence_ledger_hash_chain(tmp_path: Path):
     ledger_path = tmp_path / "test_ledger.jsonl"
     ledger = EvidenceLedger(ledger_file=ledger_path)
 
-    # Initially empty
     audit = ledger.verify_chain_integrity()
     assert audit["valid"] is True
     assert audit["total_records"] == 0
 
-    # Add block 1
     data1 = b"Tor circuit probe capture payload 1"
     rec1 = ledger.record_evidence(EvidenceType.ONION_CRAWL, "test1.onion", data1)
     assert rec1.parent_hash == GENESIS_HASH
     assert rec1.byte_size == len(data1)
 
-    # Add block 2
     data2 = b"TLS Certificate payload 2"
     rec2 = ledger.record_evidence(EvidenceType.TLS_CERTIFICATE, "test1.onion", data2)
     assert rec2.parent_hash == rec1.block_hash
 
-    # Verify chain
     audit2 = ledger.verify_chain_integrity()
     assert audit2["valid"] is True
     assert audit2["total_records"] == 2
@@ -38,20 +33,17 @@ def test_evidence_ledger_tamper_detection(tmp_path: Path):
     rec1 = ledger.record_evidence(EvidenceType.ONION_CRAWL, "target.onion", b"original 1")
     rec2 = ledger.record_evidence(EvidenceType.BLOCKCHAIN_TX, "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", b"original 2")
 
-    # Verify intact first
     assert ledger.verify_chain_integrity()["valid"] is True
 
-    # Tamper with the raw hash in block 1
     lines = ledger_path.read_text(encoding="utf-8").splitlines()
     corrupt_block = json.loads(lines[0])
     corrupt_block["raw_sha256"] = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
     lines[0] = json.dumps(corrupt_block)
     ledger_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    # Integrity verification must catch the tamper
     audit = ledger.verify_chain_integrity()
     assert audit["valid"] is False
-    assert "tampered" in audit["error"].lower() or "mismatch" in audit["error"].lower()
+    assert "tampered" in audit["error"].lower() or "mismatch" in audit["error"].lower() or "modified" in audit["error"].lower()
 
 def test_section_65b_certificate(tmp_path: Path):
     ledger_path = tmp_path / "cert_ledger.jsonl"

@@ -1,4 +1,3 @@
-import pytest
 from astra.pillars.infra_scan import InfraScanPillar
 from astra.pillars.mgrd import MgrdPillar
 from astra.pillars.cmtbp import CmtbpPillar
@@ -9,7 +8,6 @@ def test_p1_infra_scan():
     jarm = scanner.compute_jarm_fingerprint("darknet-portal.onion", 443)
     assert len(jarm) == 62
 
-    # Test clearnet leak scenario
     mock_data = {
         "san_list": ["darknet-portal.onion", "clearnet.shadow-ops.org", "198.51.100.42"],
         "leaked_ips": ["198.51.100.42"],

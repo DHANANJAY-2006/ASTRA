@@ -1,11 +1,9 @@
 import re
-import math
-from typing import List, Dict, Optional, Any, Set
+from typing import List, Dict, Any, Set
 
 from astra.core.evidence import ledger
 from astra.core.models import CaaResult, EvidenceType
 
-# Linguistic and cognitive indicator dictionaries
 COGNITIVE_CERTAINTY_MARKERS: Set[str] = {
     "definitely", "always", "obviously", "guaranteed", "impossible", "undeniable", "100%", "never", "strictly"
 }
@@ -17,20 +15,10 @@ DARKNET_TECH_JARGON: Set[str] = {
 }
 
 class CaaPillar:
-    """
-    P4: CAA (Cognitive Argument Architecture).
-    Advanced NLP stylometry and cognitive argument profiling.
-    Extracts idiosyncratic syntax, punctuation signatures, lexical richness,
-    and cognitive reasoning patterns to correlate anonymous forum postings across personas.
-    """
-
     def __init__(self):
         self.name = "P4: CAA"
 
     def extract_features(self, text: str) -> Dict[str, Any]:
-        """
-        Extracts stylometric and cognitive feature vectors from text.
-        """
         clean_text = text.strip()
         if not clean_text:
             return {
@@ -41,19 +29,14 @@ class CaaPillar:
                 "word_count": 0
             }
 
-        # Tokenization
         words = re.findall(r"\b[\w'-]+\b", clean_text.lower())
         sentences = [s.strip() for s in re.split(r"[.!?]+", clean_text) if s.strip()]
         
         word_count = len(words)
         unique_words = len(set(words))
-        # Type-Token Ratio (Lexical Diversity)
         ttr = (unique_words / word_count) if word_count > 0 else 0.0
-
-        # Sentence length
         avg_sent_len = (word_count / len(sentences)) if sentences else 0.0
 
-        # Punctuation signature
         punct_counts = {
             "exclamations": len(re.findall(r"!{2,}", clean_text)),
             "ellipses": len(re.findall(r"\.{3,}", clean_text)),
@@ -62,11 +45,9 @@ class CaaPillar:
             "quotes": clean_text.count('"') + clean_text.count("'"),
             "emoticons": len(re.findall(r"[:;=8]['-]?[\)D\(P\/\\]", clean_text))
         }
-        # Normalize per 1000 words
         norm_factor = 1000.0 / max(word_count, 1)
         punct_signature = {k: round(v * norm_factor, 2) for k, v in punct_counts.items()}
 
-        # Cognitive markers
         found_markers: List[str] = []
         for w in set(words):
             if w in COGNITIVE_CERTAINTY_MARKERS:
@@ -90,37 +71,27 @@ class CaaPillar:
         sample_b: str,
         sample_id: str = "CAA-EVAL-01"
     ) -> CaaResult:
-        """
-        Compares two text samples (e.g. unknown vendor listing vs suspect forum post)
-        and computes stylometric cosine/manhattan similarity.
-        """
         feat_a = self.extract_features(sample_a)
         feat_b = self.extract_features(sample_b)
 
-        # Compute metric similarities
-        # 1. Lexical diversity difference
         ttr_diff = abs(feat_a["ttr"] - feat_b["ttr"])
         ttr_sim = max(0.0, 1.0 - (ttr_diff * 2.0))
 
-        # 2. Sentence length difference
         sent_diff = abs(feat_a["avg_sent_len"] - feat_b["avg_sent_len"])
         sent_sim = max(0.0, 1.0 - (sent_diff / 25.0))
 
-        # 3. Punctuation signature similarity
         p_a = feat_a["punctuation"]
         p_b = feat_b["punctuation"]
         all_keys = set(p_a.keys()).union(p_b.keys())
         dist = sum(abs(p_a.get(k, 0.0) - p_b.get(k, 0.0)) for k in all_keys)
         punct_sim = max(0.0, 1.0 - (dist / 30.0))
 
-        # 4. Shared cognitive markers
         set_a = set(feat_a["cognitive_markers"])
         set_b = set(feat_b["cognitive_markers"])
         inter = set_a.intersection(set_b)
         union = set_a.union(set_b)
         jaccard = (len(inter) / len(union)) if union else 0.5
 
-        # Weighted aggregate similarity
         author_similarity = (
             0.30 * ttr_sim +
             0.25 * sent_sim +
@@ -139,7 +110,6 @@ class CaaPillar:
             confidence_score=round(author_similarity, 3)
         )
 
-        # Record evidence to Section 65B hash chain
         ledger.record_evidence(
             evidence_type=EvidenceType.TEXT_SAMPLE,
             source_target=sample_id,
@@ -149,5 +119,4 @@ class CaaPillar:
 
         return result
 
-# Singleton instance
 caa_profiler = CaaPillar()

@@ -1,103 +1,171 @@
 # 🛡️ PROJECT ASTRA: Darknet Threat Actor De-Anonymization Engine
 
-**Smart India Hackathon (SIH) 2026**  
-- **Problem Statement ID**: 26151  
-- **Problem Statement Title**: Dark web threat actor de-anonymization  
-- **Theme**: Blockchain & Cyber Security  
-- **Category**: Software / Forensic Tool  
-- **Team**: Team BISHOP  
+<p align="center">
+  <img src="https://img.shields.io/badge/SIH-2026-blue.svg?style=for-the-badge&logo=target" alt="SIH 2026" />
+  <img src="https://img.shields.io/badge/Problem%20Statement-26151-red.svg?style=for-the-badge" alt="Problem Statement 26151" />
+  <img src="https://img.shields.io/badge/Team-BISHOP-purple.svg?style=for-the-badge" alt="Team BISHOP" />
+  <img src="https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue?style=for-the-badge&logo=python" alt="Python Version" />
+  <img src="https://img.shields.io/badge/Legal%20Admissibility-Section%2065B%20%7C%20BSA%202023-emerald?style=for-the-badge" alt="BSA 2023" />
+  <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge" alt="License" />
+</p>
 
 ---
 
-## 📌 Executive Summary
+## 📌 Repository "About" Description
 
-**ASTRA** (*Adaptive Stylometric Threat Reconstruction Architecture*) is an autonomous, non-invasive threat intelligence and digital forensic software tool. Built for Law Enforcement Agencies (LEAs—such as NTRO, CBI, NIA, and State Cyber Crime units), ASTRA continuously ingests, correlates, and attributes fragmented darknet persona footprints to real-world threat actors.
-
-ASTRA operates strictly as a **forensic software & CLI toolsuite / intelligence daemon**, fusing multi-modal technical, financial, behavioral, and cognitive evidence layers without active intrusion or illegal transactions.
+> **Project ASTRA** is an autonomous darknet threat intelligence and forensic de-anonymization engine built for Law Enforcement Agencies (NTRO, CBI, NIA, State Police). Fuses Tor JARM reconnaissance, marketplace ghost residue tracking, crypto mixer-piercing breathing heuristics (CMTBP), and cognitive argument stylometry (CAA) into a deterministic 0–100% confidence score under Section 65B Indian Evidence Act / BSA 2023 cryptographic chain-of-custody.
 
 ---
 
-## 🏛️ The 4-Pillar De-Anonymization Engine
+## ⚡ Quickstart: Install & Run on Your PC
 
-ASTRA achieves high-accuracy attribution through four specialized analytical pillars:
+### Method 1: Local Installation (Recommended)
+
+```powershell
+# 1. Clone the repository
+git clone https://github.com/DHANANJAY-2006/ASTRA.git
+cd ASTRA
+
+# 2. Install dependencies & CLI in editable mode
+pip install -r requirements.txt
+pip install -e .
+
+# 3. Verify installation
+python -m astra version
+```
+
+### Method 2: Direct Install via Pip
+
+```powershell
+pip install git+https://github.com/DHANANJAY-2006/ASTRA.git
+astra --help
+```
+
+### Method 3: Run via Docker (Zero Configuration)
+
+```powershell
+docker compose up --build
+```
+Spins up the isolated **Tor SOCKS5 stealth proxy** and the **ASTRA Forensic Engine** automatically.
+
+---
+
+## 🏛️ The 4-Pillar De-Anonymization Architecture
+
+```
+                                  ┌────────────────────────┐
+                                  │   Target Threat Actor  │
+                                  └───────────┬────────────┘
+                                              │
+         ┌──────────────────┬─────────────────┼─────────────────┬──────────────────┐
+         │                  │                 │                 │                  │
+         ▼                  ▼                 ▼                 ▼                  ▼
+┌─────────────────┐┌─────────────────┐┌─────────────────┐┌─────────────────┐┌─────────────────┐
+│ P1: INFRA-SCAN  ││    P2: MGRD     ││   P3: CMTBP     ││    P4: CAA      ││  LEA TAXONOMY   │
+│ Tor JARM Recon  ││ Market Residue  ││ Crypto Breathing││  Cognitive NLP  ││ Activity Class │
+│ Clearnet Leaks  ││  PGP Migration  ││ Mixer Piercing  ││ Stylometry Tree ││ PII/Carding/APT │
+└────────┬────────┘└────────┬────────┘└────────┬────────┘└────────┬────────┘└────────┬────────┘
+         │                  │                 │                 │                  │
+         └──────────────────┴─────────┬───────┴─────────────────┴──────────────────┘
+                                      ▼
+                        ┌───────────────────────────┐
+                        │    DACS Scoring Engine    │
+                        │ Multi-Signal Fusion 0-100%│
+                        └─────────────┬─────────────┘
+                                      ▼
+                 ┌─────────────────────────────────────────┐
+                 │ Section 65B BSA 2023 Cryptographic Hash │
+                 │       Court-Admissible Evidence         │
+                 └────────────────────┬────────────────────┘
+                                      ▼
+                ┌───────────────────────────────────────────┐
+                │ Central Interactive Investigation Canvas  │
+                │     STIX 2.1 JSON / Court Legal Brief     │
+                └───────────────────────────────────────────┘
+```
 
 1. **P1: INFRA-SCAN (Tor Misconfiguration Recon)**  
-   Detects cryptographic, network, and server misconfigurations across hidden services (JARM fingerprinting, SSL/TLS certificate leaks, clearnet IP address correlation, and backend port exposure).
+   Extracts 62-character JARM TLS cipher fingerprints, inspects SSL/TLS certificate Subject Alternative Names (SAN), flags exposed backend management ports, and discovers leaked clearnet IPv4 addresses.
 2. **P2: MGRD (Marketplace Ghost Residue Detection)**  
-   Tracks vendor migration footprints, PGP public key reuse, and temporal migration reaction windows following darknet marketplace seizures and takedowns.
+   De-anonymizes vendors relocating across darknet forum seizures and takedowns by tracking normalized PGP public key fingerprints and temporal migration reaction windows (12–72 hours).
 3. **P3: CMTBP (Crypto Micro-Transaction Breathing Pattern)**  
-   Analyzes on-chain Bitcoin/Monero UTXO flows, fee heuristics, and pre-mixer micro-transaction testing rituals to pierce coin-mixing obfuscation.
+   Pierces Wasabi and Whirlpool coin mixers by detecting pre-mixer testing rituals (< 0.003 BTC trial transactions) and modeling UTXO cluster sweep intervals.
 4. **P4: CAA (Cognitive Argument Architecture)**  
-   Extracts deep NLP stylometric feature vectors (structural syntax patterns, cognitive certainty/hedging markers, punctuation signatures, and argument trees) to identify personas across pseudonyms.
+   NLP stylometric author attribution mapping Type-Token Ratio (TTR), idiosyncratic punctuation patterns, and cognitive certainty vs. hedging markers across pseudonyms.
+
+---
+
+## 📊 Central Interactive Investigation Canvas
+
+ASTRA generates an interconnected forensic network graph in the center of the investigation, visually mapping every entity linked to the threat actor:
+
+```powershell
+python -m astra graph --open
+```
+
+- **Interactive Canvas**: Drag, zoom, pan, and inspect connections between onion services, PGP keys, Bitcoin wallets, and leaked IPs.
+- **Forensic Inspector**: Click any node to open the side inspector panel displaying raw evidence, confidence scores, and SHA-256 hashes.
+- **Filter Bar**: Toggle visibility across all 4 pillars and the legal chain.
+
+---
+
+## 💻 Forensic CLI Commands
+
+| Command | Action | Example |
+| :--- | :--- | :--- |
+| `astra version` | Display engine version and compliance info | `python -m astra version` |
+| `astra scan <target>` | P1: INFRA-SCAN Tor hidden service reconnaissance | `python -m astra scan market.onion --simulate-leak` |
+| `astra trace <wallet>` | P3: CMTBP On-chain mixer & UTXO breathing analysis | `python -m astra trace bc1q9v8t3z4x7p2m...` |
+| `astra stylometry <a.txt> <b.txt>` | P4: CAA Stylometric cognitive author comparison | `python -m astra stylometry sample1.txt sample2.txt` |
+| `astra classify <text>` | Classify darknet listing into LEA crime categories | `python -m astra classify "selling leaked aadhaar db"` |
+| `astra correlate` | Run full 4-pillar DACS fusion & export dossier | `python -m astra correlate --demo` |
+| `astra graph` | Launch central interactive network canvas in browser | `python -m astra graph --open` |
+| `astra verify-chain` | Audit Section 65B / BSA 2023 cryptographic hash chain | `python -m astra verify-chain` |
 
 ---
 
 ## ⚖️ Evidentiary Admissibility (BSA 2023 / Section 65B)
 
-All forensic artifacts, raw telemetries, and attribution outputs are anchored in a cryptographically verifiable **SHA-256 hash chain**, guaranteeing full chain-of-custody compliance under Section 65B of the Indian Evidence Act and Bharatiya Sakshya Adhiniyam (BSA) 2023.
+All evidence collected during passive reconnaissance is anchored into an immutable **SHA-256 hash chain ledger** (`data/evidence_ledger.jsonl`). Each block links cryptographically to the parent block hash:
+
+$$\text{Block Hash} = \text{SHA-256}(\text{Parent Hash} \parallel \text{Raw SHA-256} \parallel \text{Timestamp} \parallel \text{Evidence ID})$$
+
+ASTRA automatically exports court-admissible certificates under Section 65B of the Indian Evidence Act and Bharatiya Sakshya Adhiniyam, 2023.
 
 ---
 
-## 💻 CLI Tool Usage (`astra`)
-
-### 1. Show Version & Compliance
-```powershell
-python -m astra version
-```
-
-### 2. P1: INFRA-SCAN (Tor Hidden Service Recon)
-```powershell
-python -m astra scan shadowmarket.onion --simulate-leak
-```
-
-### 3. P3: CMTBP (Cryptocurrency Mixer & UTXO Analysis)
-```powershell
-python -m astra trace bc1q9v8t3z4x7p2m6k8h1n0s5d3f7j9a2c4e6g8w
-```
-
-### 4. P4: CAA (Cognitive Stylometry Comparison)
-```powershell
-python -m astra stylometry sample_a.txt sample_b.txt
-```
-
-### 5. DACS Multi-Signal Fusion & Court Brief Generation
-```powershell
-python -m astra correlate --case "ASTRA-CASE-26151" --persona "VektorVendor_X" --demo
-```
-This automatically produces:
-- Forensic Court Brief: `reports/ASTRA-CASE-26151_brief.md`
-- JSON Evidence Dossier: `reports/ASTRA-CASE-26151_dossier.json`
-- Inter-Agency STIX 2.1 Bundle: `reports/ASTRA-CASE-26151_stix21.json`
-
-### 6. Audit Section 65B Hash Chain Integrity
-```powershell
-python -m astra verify-chain
-```
-
----
-
-## 🧪 Running Automated Tests
+## 🧪 Automated Testing
 
 ```powershell
 python -m pytest -v
 ```
-All 16 unit and integration test suites cover:
-- Cryptographic hash chain immutability & tamper detection
-- Section 65B certificate generation
+
+All 18 test suites validate:
+- Cryptographic hash chain immutability & tamper resistance
 - All 4 analytical pillars (INFRA-SCAN, MGRD, CMTBP, CAA)
-- DACS multi-signal fusion algorithm
-- STIX 2.1 and forensic dossier export
-- CLI command invocation
+- DACS multi-signal fusion math & threshold bounds
+- Central interactive graph rendering
+- LEA threat taxonomy classification
+- STIX 2.1 and court dossier export formats
 
 ---
 
-## 🐳 Docker Deployment
+## 📁 Repository Structure
 
-ASTRA is 100% containerized and runs on any standard 8-core workstation or private server:
-
-```powershell
-docker compose up --build
 ```
-This deploys:
-1. `tor-proxy`: Isolated Tor SOCKS5 stealth proxy daemon.
-2. `astra-engine`: Containerized ASTRA intelligence engine and CLI.
+ASTRA/
+├── astra/
+│   ├── cli/             # Rich terminal CLI toolsuite
+│   ├── core/            # Evidence ledger, data models, LEA taxonomy
+│   ├── dacs/            # DACS multi-signal fusion engine (0-100%)
+│   ├── exporters/       # STIX 2.1 JSON and court brief generators
+│   ├── ingestion/       # Tor SOCKS5 passive ingestion collector
+│   ├── pillars/         # P1 (INFRA), P2 (MGRD), P3 (CMTBP), P4 (CAA)
+│   └── visualization/   # Interactive central graph canvas builder
+├── data/                # Local evidence ledger & samples
+├── reports/             # Exported briefs, STIX 2.1 bundles, and graphs
+├── tests/               # 18 automated unit and integration tests
+├── Dockerfile           # Multi-stage containerization
+├── docker-compose.yml   # Multi-service deployment with Tor proxy
+└── pyproject.toml       # Python packaging configuration
+```

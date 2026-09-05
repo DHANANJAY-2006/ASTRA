@@ -1,4 +1,3 @@
-import pytest
 from astra.dacs.engine import DacsScoringEngine
 from astra.core.models import (
     InfraScanResult,
@@ -23,10 +22,8 @@ def test_dacs_high_attribution():
 def test_dacs_single_signal_penalty():
     engine = DacsScoringEngine()
 
-    # Only one pillar has a score; others are 0.0
     p1 = InfraScanResult(target="t.onion", confidence_score=0.80)
     report = engine.fuse_signals("CASE-002", "solitary_actor", infra_result=p1)
 
-    # 0.25 * 0.80 = 0.20, minus single signal penalty 0.15 = 0.05 (5%)
     assert report.dacs_score < 25.0
     assert "INSUFFICIENT" in report.attribution_verdict

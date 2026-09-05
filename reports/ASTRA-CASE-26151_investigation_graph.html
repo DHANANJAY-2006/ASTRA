@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASTRA Forensic Investigation Graph | VektorVendor_X</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(17, 24, 39, 0.85);
+      --border: #1f2937;
+      --text: #f3f4f6;
+      --text-dim: #9ca3af;
+      --accent: #a855f7;
+      --cyan: #06b6d4;
+      --orange: #f97316;
+      --yellow: #eab308;
+      --green: #10b981;
+      --red: #ef4444;
+      --pink: #ec4899;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+    header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 64px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 10;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #fff;
+    }
+    .brand-badge {
+      background: rgba(168, 85, 247, 0.2);
+      color: var(--accent);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .metrics-bar {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .metric-pill {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    .metric-pill .label {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .metric-pill .value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .metric-pill .dacs {
+      color: var(--green);
+    }
+    #canvas-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    svg {
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+    svg:active {
+      cursor: grabbing;
+    }
+    .link {
+      stroke: #374151;
+      stroke-opacity: 0.6;
+      stroke-width: 1.5px;
+      transition: stroke 0.2s, stroke-opacity 0.2s;
+    }
+    .link.highlight {
+      stroke: var(--accent);
+      stroke-opacity: 1;
+      stroke-width: 2.5px;
+    }
+    .node circle {
+      stroke-width: 2px;
+      transition: transform 0.2s, stroke-width 0.2s;
+    }
+    .node:hover circle {
+      stroke-width: 4px;
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+    }
+    .node text {
+      fill: #e5e7eb;
+      font-size: 11px;
+      font-weight: 500;
+      pointer-events: none;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+    #inspector-panel {
+      position: absolute;
+      top: 80px;
+      right: 20px;
+      width: 360px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      z-index: 20;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    #inspector-panel.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(20px);
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+    .panel-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .close-btn:hover { color: #fff; }
+    .detail-row {
+      margin-bottom: 12px;
+    }
+    .detail-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .detail-value {
+      font-size: 0.85rem;
+      color: #e5e7eb;
+      word-break: break-all;
+      background: rgba(0,0,0,0.25);
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .legend {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 10;
+      font-size: 0.75rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .controls-bar {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+    .ctrl-btn {
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.15s;
+    }
+    .ctrl-btn:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="brand-title">PROJECT ASTRA</span>
+      <span class="brand-badge">SIH 2026 / TEAM BISHOP</span>
+    </div>
+    <div class="metrics-bar">
+      <div class="metric-pill">
+        <span class="label">Target Persona</span>
+        <span class="value">VektorVendor_X</span>
+      </div>
+      <div class="metric-pill">
+        <span class="label">Case Reference</span>
+        <span class="value">ASTRA-CASE-26151</span>
+      </div>
+      <div class="metric-pill">
+        <span class="label">DACS Confidence</span>
+        <span class="value dacs">100.0%</span>
+      </div>
+    </div>
+  </header>
+
+  <div id="canvas-container">
+    <svg id="network-canvas"></svg>
+  </div>
+
+  <div id="inspector-panel" class="hidden">
+    <div class="panel-header">
+      <div class="panel-title" id="panel-node-title">Evidence Inspector</div>
+      <button class="close-btn" onclick="closeInspector()">&times;</button>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Entity Type</div>
+      <div class="detail-value" id="panel-type">-</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Attribution Pillar</div>
+      <div class="detail-value" id="panel-pillar">-</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Confidence</div>
+      <div class="detail-value" id="panel-conf">-</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Forensic Detail</div>
+      <div class="detail-value" id="panel-details">-</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#a855f7"></div> Target Persona</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div> P1: Tor Infrastructure & JARM</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div> P1: Leaked Clearnet IP</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div> P2: Marketplace Residue & PGP</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#eab308"></div> P3: Crypto UTXO & Mixers</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div> P4: Cognitive Stylometry</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ec4899"></div> Section 65B Hash Anchor</div>
+  </div>
+
+  <div class="controls-bar">
+    <button class="ctrl-btn" onclick="resetZoom()">Fit to Screen</button>
+  </div>
+
+  <script>
+    const data = {"nodes": [{"id": "persona_vektorvendor_x", "label": "VektorVendor_X", "type": "persona", "pillar": "TARGET", "confidence": "100.0%", "details": "De-anonymization Target | DACS Composite Score: 100.0%", "size": 28, "color": "#a855f7"}, {"id": "node_tor_service", "label": "vektorvendor_x.onion", "type": "infrastructure", "pillar": "P1_INFRA_SCAN", "confidence": "100%", "details": "V3 Hidden Service Gateway", "size": 20, "color": "#06b6d4"}, {"id": "node_jarm", "label": "JARM: 6e25982ab4ea...", "type": "jarm_fingerprint", "pillar": "P1_INFRA_SCAN", "confidence": "95%", "details": "TLS Client Hello Fingerprint: 6e25982ab4eadc623b16f1ea4860eddcb381b409a0887bdb0f1c9a69d64fd8", "size": 16, "color": "#0ea5e9"}, {"id": "node_clearnet_ip_0", "label": "LEAKED IP: 185.220.101.5", "type": "clearnet_ip", "pillar": "P1_INFRA_SCAN", "confidence": "100%", "details": "Clearnet IP exposed via certificate SAN misconfiguration: 185.220.101.5", "size": 22, "color": "#ef4444"}, {"id": "node_pgp_key", "label": "PGP: 92F4 81B3 E45C", "type": "pgp_key", "pillar": "P2_MGRD", "confidence": "100%", "details": "PGP Public Key Fingerprint: 92F4 81B3 E45C 70A1 0D32", "size": 18, "color": "#f97316"}, {"id": "node_forum_alphabay_v2", "label": "AlphaBay_V2", "type": "marketplace", "pillar": "P2_MGRD", "confidence": "92%", "details": "Discovered vendor listing footprint on AlphaBay_V2", "size": 16, "color": "#fb923c"}, {"id": "node_forum_bohemiamarket", "label": "BohemiaMarket", "type": "marketplace", "pillar": "P2_MGRD", "confidence": "92%", "details": "Discovered vendor listing footprint on BohemiaMarket", "size": 16, "color": "#fb923c"}, {"id": "node_forum_abacusdarknet", "label": "AbacusDarknet", "type": "marketplace", "pillar": "P2_MGRD", "confidence": "92%", "details": "Discovered vendor listing footprint on AbacusDarknet", "size": 16, "color": "#fb923c"}, {"id": "node_wallet_primary", "label": "BTC: bc1q9v8t3z...4e6g8w", "type": "wallet", "pillar": "P3_CMTBP", "confidence": "95%", "details": "Bitcoin Primary Deposit Address: bc1q9v8t3z4x7p2m6k8h1n0s5d3f7j9a2c4e6g8w", "size": 20, "color": "#eab308"}, {"id": "node_premix_test", "label": "Pre-Mix Ritual (0.001 BTC)", "type": "crypto_tx", "pillar": "P3_CMTBP", "confidence": "90%", "details": "Micro-transaction testing ritual identified prior to batch mixer entry", "size": 15, "color": "#facc15"}, {"id": "node_mixer_pool", "label": "Whirlpool CoinJoin Pool", "type": "mixer_pool", "pillar": "P3_CMTBP", "confidence": "95%", "details": "High-volume coin mixer heuristic signature", "size": 18, "color": "#ca8a04"}, {"id": "node_stylometry_sample", "label": "Cognitive Stylometry Profile", "type": "stylometry", "pillar": "P4_CAA", "confidence": "65.3%", "details": "High Certainty markers, idiosyncratic punctuation, and OPSEC syntax tree match", "size": 18, "color": "#10b981"}, {"id": "node_bsa_ledger", "label": "BSA 2023 #c69ff33e", "type": "evidence_anchor", "pillar": "LEGAL_CHAIN", "confidence": "100%", "details": "Section 65B Cryptographic Ledger Anchor: c69ff33ea5421f2f3bf485bf657d3302d109e79a5d68cb574f73927bad8e90af", "size": 20, "color": "#ec4899"}], "links": [{"source": "persona_vektorvendor_x", "target": "node_tor_service", "label": "HOSTS_SERVICE", "pillar": "P1"}, {"source": "node_tor_service", "target": "node_jarm", "label": "NEGOTIATES_TLS", "pillar": "P1"}, {"source": "node_tor_service", "target": "node_clearnet_ip_0", "label": "LEAKS_IP", "pillar": "P1"}, {"source": "persona_vektorvendor_x", "target": "node_pgp_key", "label": "SIGNS_WITH_PGP", "pillar": "P2"}, {"source": "node_pgp_key", "target": "node_forum_alphabay_v2", "label": "REUSED_ON_FORUM", "pillar": "P2"}, {"source": "node_pgp_key", "target": "node_forum_bohemiamarket", "label": "REUSED_ON_FORUM", "pillar": "P2"}, {"source": "node_pgp_key", "target": "node_forum_abacusdarknet", "label": "REUSED_ON_FORUM", "pillar": "P2"}, {"source": "persona_vektorvendor_x", "target": "node_wallet_primary", "label": "CONTROLS_WALLET", "pillar": "P3"}, {"source": "node_wallet_primary", "target": "node_premix_test", "label": "TRANSACTS_MICROTST", "pillar": "P3"}, {"source": "node_premix_test", "target": "node_mixer_pool", "label": "FEE_DUMP_INTO_MIXER", "pillar": "P3"}, {"source": "persona_vektorvendor_x", "target": "node_stylometry_sample", "label": "WRITING_STYLE_MATCH", "pillar": "P4"}, {"source": "persona_vektorvendor_x", "target": "node_bsa_ledger", "label": "CRYPTOGRAPHIC_CUSTODY", "pillar": "LEGAL"}], "case_id": "ASTRA-CASE-26151", "dacs_score": 100.0};
+    const svg = d3.select("#network-canvas");
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    const g = svg.append("g");
+    const zoom = d3.zoom().scaleExtent([0.2, 3]).on("zoom", (e) => g.attr("transform", e.transform));
+    svg.call(zoom);
+
+    const simulation = d3.forceSimulation(data.nodes)
+      .force("link", d3.forceLink(data.links).id(d => d.id).distance(140))
+      .force("charge", d3.forceManyBody().strength(-450))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("collision", d3.forceCollide().radius(d => d.size + 15));
+
+    const link = g.append("g")
+      .selectAll("line")
+      .data(data.links)
+      .join("line")
+      .attr("class", "link");
+
+    const node = g.append("g")
+      .selectAll("g")
+      .data(data.nodes)
+      .join("g")
+      .attr("class", "node")
+      .call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended));
+
+    node.append("circle")
+      .attr("r", d => d.size)
+      .attr("fill", d => d.color)
+      .attr("stroke", "#ffffff")
+      .attr("stroke-opacity", 0.3);
+
+    node.append("text")
+      .attr("dx", d => d.size + 6)
+      .attr("dy", "0.35em")
+      .text(d => d.label);
+
+    node.on("click", (event, d) => {
+      event.stopPropagation();
+      openInspector(d);
+    });
+
+    svg.on("click", () => closeInspector());
+
+    simulation.on("tick", () => {
+      link
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+
+      node.attr("transform", d => `translate(${d.x},${d.y})`);
+    });
+
+    function dragstarted(event, d) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+
+    function dragged(event, d) {
+      d.fx = event.x;
+      d.fy = event.y;
+    }
+
+    function dragended(event, d) {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    }
+
+    function openInspector(d) {
+      const p = document.getElementById("inspector-panel");
+      document.getElementById("panel-node-title").textContent = d.label;
+      document.getElementById("panel-type").textContent = d.type;
+      document.getElementById("panel-pillar").textContent = d.pillar;
+      document.getElementById("panel-conf").textContent = d.confidence;
+      document.getElementById("panel-details").textContent = d.details;
+      p.classList.remove("hidden");
+    }
+
+    function closeInspector() {
+      document.getElementById("inspector-panel").classList.add("hidden");
+    }
+
+    function resetZoom() {
+      svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
+    }
+  </script>
+</body>
+</html>

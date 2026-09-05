@@ -1,17 +1,10 @@
 import hashlib
 from typing import List, Dict, Optional, Any
-from datetime import datetime
 
 from astra.core.evidence import ledger
 from astra.core.models import CmtbpResult, EvidenceType
 
 class CmtbpPillar:
-    """
-    P3: CMTBP (Crypto Micro-Transaction Breathing Pattern).
-    Pierces cryptocurrency mixers by analyzing on-chain transaction flows,
-    detecting pre-mixer micro-transaction testing rituals, and modeling UTXO cluster breathing cadences.
-    """
-
     def __init__(self):
         self.name = "P3: CMTBP"
 
@@ -21,11 +14,8 @@ class CmtbpPillar:
         transactions: Optional[List[Dict[str, Any]]] = None,
         cryptocurrency: str = "BTC"
     ) -> CmtbpResult:
-        """
-        Evaluates wallet transaction history for mixer interaction and breathing patterns.
-        """
         flagged_patterns: List[str] = []
-        score = 0.1  # Baseline
+        score = 0.1
         micro_tx_count = 0
         mixer_signature: Optional[str] = None
         breathing_period_hours = 0.0
@@ -34,9 +24,6 @@ class CmtbpPillar:
         tx_list = transactions or []
 
         if not tx_list:
-            # Baseline probe if address provided without offline transaction list
-            addr_hash = hashlib.sha256(wallet_address.encode()).hexdigest()
-            # Deterministic simulation for synthetic address analysis
             score = 0.45
             flagged_patterns.append(f"Target address monitored on {cryptocurrency} blockchain: {wallet_address}")
             flagged_patterns.append("Unspent Transaction Output (UTXO) history requires active explorer feed")
@@ -51,8 +38,6 @@ class CmtbpPillar:
                 flagged_patterns=flagged_patterns
             )
 
-        # 1. Detect Pre-Mixer Micro-Transaction Testing Rituals
-        # (Threat actors routinely send micro-amounts < 0.002 BTC shortly before mixer batch deposit)
         micro_txs = [
             tx for tx in tx_list
             if 0.0001 <= tx.get("amount", 0.0) <= 0.003
@@ -65,7 +50,6 @@ class CmtbpPillar:
                 f"HIGH: Identified {micro_tx_count} pre-mixer micro-transaction test ritual(s) (< 0.003 {cryptocurrency})"
             )
 
-        # 2. Mixer Heuristic Signatures (e.g. Whirlpool 0.05 BTC pools, CoinJoin round denominations)
         equal_output_txs = [
             tx for tx in tx_list
             if tx.get("is_coinjoin", False) or tx.get("amount") in [0.01, 0.05, 0.1, 0.5]
@@ -75,7 +59,6 @@ class CmtbpPillar:
             mixer_signature = "CoinJoin / Wasabi / Whirlpool Equal-Output Pool Heuristic"
             flagged_patterns.append(f"CRITICAL: Mixer interaction signature detected: {mixer_signature}")
 
-        # 3. UTXO Cluster and Breathing Cadence
         timestamps = [
             tx["timestamp"] for tx in tx_list
             if "timestamp" in tx and isinstance(tx["timestamp"], (int, float))
@@ -87,11 +70,10 @@ class CmtbpPillar:
             breathing_period_hours = round(avg_delta_hours, 2)
             utxo_cluster_size = len(tx_list)
             
-            # Predictable automated sweep or bot behavior
             if 1.0 <= breathing_period_hours <= 24.0:
                 score += 0.20
                 flagged_patterns.append(
-                    f"Periodic UTXO 'breathing' interval observed: avg sweep every {breathing_period_hours:.1f} hours"
+                    f"Periodic UTXO breathing interval observed: avg sweep every {breathing_period_hours:.1f} hours"
                 )
 
         final_score = min(1.0, max(0.0, score))
@@ -107,7 +89,6 @@ class CmtbpPillar:
             flagged_patterns=flagged_patterns
         )
 
-        # Record evidence to Section 65B hash chain
         ledger.record_evidence(
             evidence_type=EvidenceType.BLOCKCHAIN_TX,
             source_target=wallet_address,
@@ -117,5 +98,4 @@ class CmtbpPillar:
 
         return result
 
-# Singleton instance
 cmtbp_tracer = CmtbpPillar()

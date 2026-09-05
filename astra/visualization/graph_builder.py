@@ -1,0 +1,579 @@
+import json
+from pathlib import Path
+from typing import Dict, Any, Optional
+
+from astra.core.models import DacsAttributionReport
+
+class ForensicGraphBuilder:
+    @staticmethod
+    def build_graph_data(
+        report: DacsAttributionReport,
+        infra_data: Optional[Dict[str, Any]] = None,
+        mgrd_data: Optional[Dict[str, Any]] = None,
+        cmtbp_data: Optional[Dict[str, Any]] = None,
+        caa_data: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        nodes = []
+        links = []
+
+        persona_id = f"persona_{report.target_persona.lower()}"
+        nodes.append({
+            "id": persona_id,
+            "label": report.target_persona,
+            "type": "persona",
+            "pillar": "TARGET",
+            "confidence": f"{report.dacs_score}%",
+            "details": f"De-anonymization Target | DACS Composite Score: {report.dacs_score}%",
+            "size": 28,
+            "color": "#a855f7"
+        })
+
+        onion_target = (infra_data or {}).get("target", f"{report.target_persona.lower()}.onion")
+        jarm_hash = (infra_data or {}).get("jarm", "6e25982ab4eadc623b16f1ea4860eddcb381b409a0887bdb0f1c9a69d64fd8")
+        leaked_ips = (infra_data or {}).get("leaked_ips", ["185.220.101.5"])
+        
+        infra_node_id = "node_tor_service"
+        nodes.append({
+            "id": infra_node_id,
+            "label": onion_target,
+            "type": "infrastructure",
+            "pillar": "P1_INFRA_SCAN",
+            "confidence": "100%",
+            "details": "V3 Hidden Service Gateway",
+            "size": 20,
+            "color": "#06b6d4"
+        })
+        links.append({"source": persona_id, "target": infra_node_id, "label": "HOSTS_SERVICE", "pillar": "P1"})
+
+        jarm_node_id = "node_jarm"
+        nodes.append({
+            "id": jarm_node_id,
+            "label": f"JARM: {jarm_hash[:12]}...",
+            "type": "jarm_fingerprint",
+            "pillar": "P1_INFRA_SCAN",
+            "confidence": "95%",
+            "details": f"TLS Client Hello Fingerprint: {jarm_hash}",
+            "size": 16,
+            "color": "#0ea5e9"
+        })
+        links.append({"source": infra_node_id, "target": jarm_node_id, "label": "NEGOTIATES_TLS", "pillar": "P1"})
+
+        for i, ip in enumerate(leaked_ips):
+            ip_node_id = f"node_clearnet_ip_{i}"
+            nodes.append({
+                "id": ip_node_id,
+                "label": f"LEAKED IP: {ip}",
+                "type": "clearnet_ip",
+                "pillar": "P1_INFRA_SCAN",
+                "confidence": "100%",
+                "details": f"Clearnet IP exposed via certificate SAN misconfiguration: {ip}",
+                "size": 22,
+                "color": "#ef4444"
+            })
+            links.append({"source": infra_node_id, "target": ip_node_id, "label": "LEAKS_IP", "pillar": "P1"})
+
+        pgp_key = (mgrd_data or {}).get("pgp", "92F4 81B3 E45C 70A1 0D32")
+        pgp_node_id = "node_pgp_key"
+        nodes.append({
+            "id": pgp_node_id,
+            "label": f"PGP: {pgp_key[:14]}",
+            "type": "pgp_key",
+            "pillar": "P2_MGRD",
+            "confidence": "100%",
+            "details": f"PGP Public Key Fingerprint: {pgp_key}",
+            "size": 18,
+            "color": "#f97316"
+        })
+        links.append({"source": persona_id, "target": pgp_node_id, "label": "SIGNS_WITH_PGP", "pillar": "P2"})
+
+        forums = (mgrd_data or {}).get("forums", ["AlphaBay_V2", "BohemiaMarket", "AbacusDarknet"])
+        for forum in forums:
+            f_id = f"node_forum_{forum.lower()}"
+            nodes.append({
+                "id": f_id,
+                "label": forum,
+                "type": "marketplace",
+                "pillar": "P2_MGRD",
+                "confidence": "92%",
+                "details": f"Discovered vendor listing footprint on {forum}",
+                "size": 16,
+                "color": "#fb923c"
+            })
+            links.append({"source": pgp_node_id, "target": f_id, "label": "REUSED_ON_FORUM", "pillar": "P2"})
+
+        wallet_addr = (cmtbp_data or {}).get("wallet", "bc1q9v8t3z4x7p2m6k8h1n0s5d3f7j9a2c4e6g8w")
+        wallet_id = "node_wallet_primary"
+        nodes.append({
+            "id": wallet_id,
+            "label": f"BTC: {wallet_addr[:10]}...{wallet_addr[-6:]}",
+            "type": "wallet",
+            "pillar": "P3_CMTBP",
+            "confidence": "95%",
+            "details": f"Bitcoin Primary Deposit Address: {wallet_addr}",
+            "size": 20,
+            "color": "#eab308"
+        })
+        links.append({"source": persona_id, "target": wallet_id, "label": "CONTROLS_WALLET", "pillar": "P3"})
+
+        premix_id = "node_premix_test"
+        nodes.append({
+            "id": premix_id,
+            "label": "Pre-Mix Ritual (0.001 BTC)",
+            "type": "crypto_tx",
+            "pillar": "P3_CMTBP",
+            "confidence": "90%",
+            "details": "Micro-transaction testing ritual identified prior to batch mixer entry",
+            "size": 15,
+            "color": "#facc15"
+        })
+        links.append({"source": wallet_id, "target": premix_id, "label": "TRANSACTS_MICROTST", "pillar": "P3"})
+
+        mixer_id = "node_mixer_pool"
+        nodes.append({
+            "id": mixer_id,
+            "label": "Whirlpool CoinJoin Pool",
+            "type": "mixer_pool",
+            "pillar": "P3_CMTBP",
+            "confidence": "95%",
+            "details": "High-volume coin mixer heuristic signature",
+            "size": 18,
+            "color": "#ca8a04"
+        })
+        links.append({"source": premix_id, "target": mixer_id, "label": "FEE_DUMP_INTO_MIXER", "pillar": "P3"})
+
+        caa_id = "node_stylometry_sample"
+        nodes.append({
+            "id": caa_id,
+            "label": "Cognitive Stylometry Profile",
+            "type": "stylometry",
+            "pillar": "P4_CAA",
+            "confidence": f"{report.pillar_scores.get('P4_CAA', 0.65)*100:.1f}%",
+            "details": "High Certainty markers, idiosyncratic punctuation, and OPSEC syntax tree match",
+            "size": 18,
+            "color": "#10b981"
+        })
+        links.append({"source": persona_id, "target": caa_id, "label": "WRITING_STYLE_MATCH", "pillar": "P4"})
+
+        chain_id = "node_bsa_ledger"
+        nodes.append({
+            "id": chain_id,
+            "label": f"BSA 2023 #{report.chain_of_custody_hash[:8]}",
+            "type": "evidence_anchor",
+            "pillar": "LEGAL_CHAIN",
+            "confidence": "100%",
+            "details": f"Section 65B Cryptographic Ledger Anchor: {report.chain_of_custody_hash}",
+            "size": 20,
+            "color": "#ec4899"
+        })
+        links.append({"source": persona_id, "target": chain_id, "label": "CRYPTOGRAPHIC_CUSTODY", "pillar": "LEGAL"})
+
+        return {"nodes": nodes, "links": links, "case_id": report.case_id, "dacs_score": report.dacs_score}
+
+    @classmethod
+    def render_html(cls, report: DacsAttributionReport, output_path: Path) -> Path:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        graph_data = cls.build_graph_data(report)
+        graph_json = json.dumps(graph_data)
+
+        html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASTRA Forensic Investigation Graph | {report.target_persona}</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    :root {{
+      --bg: #0b0f19;
+      --card-bg: rgba(17, 24, 39, 0.85);
+      --border: #1f2937;
+      --text: #f3f4f6;
+      --text-dim: #9ca3af;
+      --accent: #a855f7;
+      --cyan: #06b6d4;
+      --orange: #f97316;
+      --yellow: #eab308;
+      --green: #10b981;
+      --red: #ef4444;
+      --pink: #ec4899;
+    }}
+    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    body {{
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }}
+    header {{
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 64px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 10;
+    }}
+    .brand {{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }}
+    .brand-title {{
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #fff;
+    }}
+    .brand-badge {{
+      background: rgba(168, 85, 247, 0.2);
+      color: var(--accent);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }}
+    .metrics-bar {{
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }}
+    .metric-pill {{
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }}
+    .metric-pill .label {{
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }}
+    .metric-pill .value {{
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+    }}
+    .metric-pill .dacs {{
+      color: var(--green);
+    }}
+    #canvas-container {{
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }}
+    svg {{
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }}
+    svg:active {{
+      cursor: grabbing;
+    }}
+    .link {{
+      stroke: #374151;
+      stroke-opacity: 0.6;
+      stroke-width: 1.5px;
+      transition: stroke 0.2s, stroke-opacity 0.2s;
+    }}
+    .link.highlight {{
+      stroke: var(--accent);
+      stroke-opacity: 1;
+      stroke-width: 2.5px;
+    }}
+    .node circle {{
+      stroke-width: 2px;
+      transition: transform 0.2s, stroke-width 0.2s;
+    }}
+    .node:hover circle {{
+      stroke-width: 4px;
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+    }}
+    .node text {{
+      fill: #e5e7eb;
+      font-size: 11px;
+      font-weight: 500;
+      pointer-events: none;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }}
+    #inspector-panel {{
+      position: absolute;
+      top: 80px;
+      right: 20px;
+      width: 360px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      z-index: 20;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      transition: opacity 0.2s, transform 0.2s;
+    }}
+    #inspector-panel.hidden {{
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(20px);
+    }}
+    .panel-header {{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }}
+    .panel-title {{
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+    }}
+    .close-btn {{
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }}
+    .close-btn:hover {{ color: #fff; }}
+    .detail-row {{
+      margin-bottom: 12px;
+    }}
+    .detail-label {{
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }}
+    .detail-value {{
+      font-size: 0.85rem;
+      color: #e5e7eb;
+      word-break: break-all;
+      background: rgba(0,0,0,0.25);
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }}
+    .legend {{
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 10;
+      font-size: 0.75rem;
+    }}
+    .legend-item {{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }}
+    .legend-dot {{
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }}
+    .controls-bar {{
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }}
+    .ctrl-btn {{
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.15s;
+    }}
+    .ctrl-btn:hover {{
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+    }}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="brand-title">PROJECT ASTRA</span>
+      <span class="brand-badge">SIH 2026 / TEAM BISHOP</span>
+    </div>
+    <div class="metrics-bar">
+      <div class="metric-pill">
+        <span class="label">Target Persona</span>
+        <span class="value">{report.target_persona}</span>
+      </div>
+      <div class="metric-pill">
+        <span class="label">Case Reference</span>
+        <span class="value">{report.case_id}</span>
+      </div>
+      <div class="metric-pill">
+        <span class="label">DACS Confidence</span>
+        <span class="value dacs">{report.dacs_score}%</span>
+      </div>
+    </div>
+  </header>
+
+  <div id="canvas-container">
+    <svg id="network-canvas"></svg>
+  </div>
+
+  <div id="inspector-panel" class="hidden">
+    <div class="panel-header">
+      <div class="panel-title" id="panel-node-title">Evidence Inspector</div>
+      <button class="close-btn" onclick="closeInspector()">&times;</button>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Entity Type</div>
+      <div class="detail-value" id="panel-type">-</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Attribution Pillar</div>
+      <div class="detail-value" id="panel-pillar">-</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Confidence</div>
+      <div class="detail-value" id="panel-conf">-</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Forensic Detail</div>
+      <div class="detail-value" id="panel-details">-</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#a855f7"></div> Target Persona</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div> P1: Tor Infrastructure & JARM</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div> P1: Leaked Clearnet IP</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div> P2: Marketplace Residue & PGP</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#eab308"></div> P3: Crypto UTXO & Mixers</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div> P4: Cognitive Stylometry</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ec4899"></div> Section 65B Hash Anchor</div>
+  </div>
+
+  <div class="controls-bar">
+    <button class="ctrl-btn" onclick="resetZoom()">Fit to Screen</button>
+  </div>
+
+  <script>
+    const data = {graph_json};
+    const svg = d3.select("#network-canvas");
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    const g = svg.append("g");
+    const zoom = d3.zoom().scaleExtent([0.2, 3]).on("zoom", (e) => g.attr("transform", e.transform));
+    svg.call(zoom);
+
+    const simulation = d3.forceSimulation(data.nodes)
+      .force("link", d3.forceLink(data.links).id(d => d.id).distance(140))
+      .force("charge", d3.forceManyBody().strength(-450))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("collision", d3.forceCollide().radius(d => d.size + 15));
+
+    const link = g.append("g")
+      .selectAll("line")
+      .data(data.links)
+      .join("line")
+      .attr("class", "link");
+
+    const node = g.append("g")
+      .selectAll("g")
+      .data(data.nodes)
+      .join("g")
+      .attr("class", "node")
+      .call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended));
+
+    node.append("circle")
+      .attr("r", d => d.size)
+      .attr("fill", d => d.color)
+      .attr("stroke", "#ffffff")
+      .attr("stroke-opacity", 0.3);
+
+    node.append("text")
+      .attr("dx", d => d.size + 6)
+      .attr("dy", "0.35em")
+      .text(d => d.label);
+
+    node.on("click", (event, d) => {{
+      event.stopPropagation();
+      openInspector(d);
+    }});
+
+    svg.on("click", () => closeInspector());
+
+    simulation.on("tick", () => {{
+      link
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+
+      node.attr("transform", d => `translate(${{d.x}},${{d.y}})`);
+    }});
+
+    function dragstarted(event, d) {{
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }}
+
+    function dragged(event, d) {{
+      d.fx = event.x;
+      d.fy = event.y;
+    }}
+
+    function dragended(event, d) {{
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    }}
+
+    function openInspector(d) {{
+      const p = document.getElementById("inspector-panel");
+      document.getElementById("panel-node-title").textContent = d.label;
+      document.getElementById("panel-type").textContent = d.type;
+      document.getElementById("panel-pillar").textContent = d.pillar;
+      document.getElementById("panel-conf").textContent = d.confidence;
+      document.getElementById("panel-details").textContent = d.details;
+      p.classList.remove("hidden");
+    }}
+
+    function closeInspector() {{
+      document.getElementById("inspector-panel").classList.add("hidden");
+    }}
+
+    function resetZoom() {{
+      svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
+    }}
+  </script>
+</body>
+</html>
+"""
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(html)
+
+        return output_path

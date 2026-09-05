@@ -1,9 +1,9 @@
 import sys
+import webbrowser
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional
 import json
 
-# Ensure UTF-8 output on Windows consoles to prevent charmap UnicodeEncodeErrors
 if sys.platform == "win32":
     try:
         if sys.stdout.encoding != "utf-8":
@@ -21,8 +21,8 @@ from rich.progress import Progress, TextColumn
 from rich import box
 
 from astra import __version__
-from astra.config import config
 from astra.core.evidence import ledger
+from astra.core.taxonomy import taxonomy_classifier
 from astra.pillars.infra_scan import infra_scanner
 from astra.pillars.mgrd import mgrd_analyzer
 from astra.pillars.cmtbp import cmtbp_tracer
@@ -30,6 +30,7 @@ from astra.pillars.caa import caa_profiler
 from astra.dacs.engine import dacs_engine
 from astra.exporters.stix_export import Stix21Exporter
 from astra.exporters.dossier import ForensicDossierExporter
+from astra.visualization.graph_builder import ForensicGraphBuilder
 
 app = typer.Typer(
     name="astra",
@@ -54,7 +55,6 @@ def main_callback(ctx: typer.Context):
 
 @app.command("version")
 def version_cmd():
-    """Display ASTRA forensic engine version and compliance details."""
     print_banner()
     console.print(f"[bold]Engine Version:[/bold] {__version__}")
     console.print(f"[bold]Author:[/bold] Team BISHOP")
@@ -66,7 +66,6 @@ def scan_cmd(
     port: int = typer.Option(443, "--port", "-p", help="Target port for TLS/JARM recon"),
     mock_clearnet_leak: bool = typer.Option(False, "--simulate-leak", help="Simulate discovered clearnet IP leak in lab")
 ):
-    """P1: INFRA-SCAN - Passive Tor hidden service misconfiguration and JARM recon."""
     print_banner()
     console.print(f"[bold blue][P1: INFRA-SCAN][/bold blue] Probing target: [cyan]{target}[/cyan]")
     
@@ -105,16 +104,14 @@ def trace_cmd(
     wallet: str = typer.Argument(..., help="Cryptocurrency wallet address (BTC/XMR)"),
     currency: str = typer.Option("BTC", "--currency", "-c", help="Cryptocurrency type")
 ):
-    """P3: CMTBP - Trace cryptocurrency UTXO flows and pre-mixer breathing patterns."""
     print_banner()
     console.print(f"[bold yellow][P3: CMTBP][/bold yellow] Analyzing on-chain flows for: [cyan]{wallet}[/cyan]")
 
-    # Simulated on-chain sample showing pre-mixer testing ritual
     synthetic_txs = [
-        {"txid": "tx01", "amount": 0.0008, "timestamp": 1741160000, "is_coinjoin": False},  # Pre-mixer test
-        {"txid": "tx02", "amount": 4.5000, "timestamp": 1741161200, "is_coinjoin": True},   # Mixer batch
-        {"txid": "tx03", "amount": 0.0005, "timestamp": 1741198000, "is_coinjoin": False},  # Second test
-        {"txid": "tx04", "amount": 2.8000, "timestamp": 1741199500, "is_coinjoin": True},   # Second batch
+        {"txid": "tx01", "amount": 0.0008, "timestamp": 1741160000, "is_coinjoin": False},
+        {"txid": "tx02", "amount": 4.5000, "timestamp": 1741161200, "is_coinjoin": True},
+        {"txid": "tx03", "amount": 0.0005, "timestamp": 1741198000, "is_coinjoin": False},
+        {"txid": "tx04", "amount": 2.8000, "timestamp": 1741199500, "is_coinjoin": True},
     ]
 
     with Progress(TextColumn("[progress.description]{task.description}"), console=console) as progress:
@@ -139,13 +136,12 @@ def trace_cmd(
 
 @app.command("stylometry")
 def stylometry_cmd(
-    sample_a: Path = typer.Argument(..., help="Path to text sample A (e.g. forum post)"),
-    sample_b: Path = typer.Argument(..., help="Path to text sample B (e.g. suspect market listing)")
+    sample_a: Path = typer.Argument(..., help="Path to text sample A"),
+    sample_b: Path = typer.Argument(..., help="Path to text sample B")
 ):
-    """P4: CAA - Cognitive Argument Architecture and NLP stylometry comparison."""
     print_banner()
     if not sample_a.exists() or not sample_b.exists():
-        console.print(f"[bold red]Error: Specified text sample files do not exist.[/bold red]")
+        console.print("[bold red]Error: Specified text sample files do not exist.[/bold red]")
         raise typer.Exit(code=1)
 
     text_a = sample_a.read_text(encoding="utf-8")
@@ -168,19 +164,30 @@ def stylometry_cmd(
 
     console.print(table)
 
+@app.command("classify")
+def classify_cmd(
+    listing_text: str = typer.Argument(..., help="Darknet post or listing text to classify into threat heads")
+):
+    print_banner()
+    categories = taxonomy_classifier.classify(listing_text)
+    table = Table(title="LEA Threat Activity Taxonomy", box=box.ROUNDED, border_style="cyan")
+    table.add_column("Classified Threat Category", style="bold yellow")
+    for cat in categories:
+        table.add_row(cat)
+    console.print(table)
+
 @app.command("correlate")
 def correlate_cmd(
     case_id: str = typer.Option("ASTRA-CASE-26151", "--case", "-c", help="Case identifier"),
     persona: str = typer.Option("VektorVendor_X", "--persona", "-p", help="Target threat actor alias"),
-    demo: bool = typer.Option(True, "--demo", help="Run full 4-pillar demonstration workflow")
+    demo: bool = typer.Option(True, "--demo", help="Run full 4-pillar demonstration workflow"),
+    open_graph: bool = typer.Option(False, "--open", help="Instantly open interactive investigation graph in browser")
 ):
-    """Fuse all 4 pillars using the DACS Engine into a court-ready attribution report."""
     print_banner()
     console.print(f"[bold cyan]Initiating DACS Multi-Signal Fusion for Case:[/bold cyan] [bold yellow]{case_id}[/bold yellow]")
     console.print(f"[bold cyan]Target Persona:[/bold cyan] [bold white]{persona}[/bold white]\n")
 
     with Progress(TextColumn("[progress.description]{task.description}"), console=console) as progress:
-        # P1
         t1 = progress.add_task("[blue]Executing P1: INFRA-SCAN Tor Misconfig Recon...", total=None)
         infra_res = infra_scanner.scan_target(
             f"{persona.lower()}.onion",
@@ -192,7 +199,6 @@ def correlate_cmd(
         )
         progress.update(t1, completed=True)
 
-        # P2
         t2 = progress.add_task("[cyan]Executing P2: MGRD Marketplace Ghost Residue Detection...", total=None)
         mgrd_res = mgrd_analyzer.analyze_migration_residue(
             persona_alias=persona,
@@ -203,7 +209,6 @@ def correlate_cmd(
         )
         progress.update(t2, completed=True)
 
-        # P3
         t3 = progress.add_task("[yellow]Executing P3: CMTBP Crypto Micro-TX Breathing Pattern...", total=None)
         cmtbp_res = cmtbp_tracer.analyze_wallet_transactions(
             wallet_address="bc1q9v8t3z4x7p2m6k8h1n0s5d3f7j9a2c4e6g8w",
@@ -216,7 +221,6 @@ def correlate_cmd(
         )
         progress.update(t3, completed=True)
 
-        # P4
         t4 = progress.add_task("[magenta]Executing P4: CAA Cognitive Argument Stylometry...", total=None)
         suspect_text = (
             "Guaranteed delivery strictly via stealth drops!! Do not ask for escrow bypass without PGP. "
@@ -229,7 +233,6 @@ def correlate_cmd(
         caa_res = caa_profiler.compare_samples(suspect_text, reference_text, sample_id=f"CAA_{persona}")
         progress.update(t4, completed=True)
 
-        # DACS Fusion
         t_dacs = progress.add_task("[bold green]Fusing multi-modal signals into DACS Score...", total=None)
         report = dacs_engine.fuse_signals(
             case_id=case_id,
@@ -241,7 +244,6 @@ def correlate_cmd(
         )
         progress.update(t_dacs, completed=True)
 
-    # Output Fusion Results Table
     table = Table(title="ASTRA DACS FUSION ATTRIBUTION RESULTS", box=box.HEAVY_EDGE, border_style="green")
     table.add_column("Analytical Pillar", style="bold white")
     table.add_column("Focus Domain", style="dim")
@@ -264,13 +266,14 @@ def correlate_cmd(
     )
     console.print(Panel(summary_panel, title="[bold]DE-ANONYMIZATION VERDICT[/bold]", border_style="green"))
 
-    # Auto-export dossiers
     json_path = Path(f"./reports/{case_id}_dossier.json")
     md_path = Path(f"./reports/{case_id}_brief.md")
     stix_path = Path(f"./reports/{case_id}_stix21.json")
+    graph_path = Path(f"./reports/{case_id}_investigation_graph.html")
 
     ForensicDossierExporter.export_json(report, json_path)
     ForensicDossierExporter.export_markdown(report, md_path)
+    ForensicGraphBuilder.render_html(report, graph_path)
     
     stix_bundle = Stix21Exporter.generate_bundle(report)
     stix_path.parent.mkdir(parents=True, exist_ok=True)
@@ -278,13 +281,62 @@ def correlate_cmd(
         json.dump(stix_bundle, f, indent=2)
 
     console.print("\n[bold green]Intelligence Artifacts Exported Successfully:[/bold green]")
+    console.print(f"  • Central Interactive Investigation Graph: [bold cyan]{graph_path}[/bold cyan]")
     console.print(f"  • Court Brief (Markdown): [cyan]{md_path}[/cyan]")
     console.print(f"  • Forensic Dossier (JSON): [cyan]{json_path}[/cyan]")
     console.print(f"  • Inter-Agency STIX 2.1 Bundle: [cyan]{stix_path}[/cyan]")
 
+    if open_graph:
+        webbrowser.open(graph_path.resolve().as_uri())
+
+@app.command("graph")
+def graph_cmd(
+    case_id: str = typer.Option("ASTRA-CASE-26151", "--case", "-c", help="Case reference ID"),
+    persona: str = typer.Option("VektorVendor_X", "--persona", "-p", help="Target threat persona"),
+    open_browser: bool = typer.Option(True, "--open/--no-open", help="Open generated graph in web browser")
+):
+    print_banner()
+    console.print(f"[bold cyan]Rendering Interactive Forensic Graph for:[/bold cyan] [bold white]{persona}[/bold white]")
+
+    report = dacs_engine.fuse_signals(
+        case_id=case_id,
+        target_persona=persona,
+        infra_result=infra_scanner.scan_target(f"{persona.lower()}.onion", mock_data={
+            "san_list": [f"{persona.lower()}.onion", "auth.vektor-ops.ru", "185.220.101.5"],
+            "leaked_ips": ["185.220.101.5"],
+            "open_ports": [80, 443, 22]
+        }),
+        mgrd_result=mgrd_analyzer.analyze_migration_residue(
+            persona_alias=persona,
+            known_forums=["AlphaBay_V2", "BohemiaMarket", "AbacusDarknet"],
+            pgp_keys=["92F4 81B3 E45C 70A1 0D32"],
+            seizure_date_delta_hours=24.5,
+            tox_or_jabber="vektor_support@exploit.im"
+        ),
+        cmtbp_result=cmtbp_tracer.analyze_wallet_transactions(
+            wallet_address="bc1q9v8t3z4x7p2m6k8h1n0s5d3f7j9a2c4e6g8w",
+            transactions=[
+                {"txid": "tx01", "amount": 0.001, "timestamp": 1741160000, "is_coinjoin": False},
+                {"txid": "tx02", "amount": 6.200, "timestamp": 1741162000, "is_coinjoin": True},
+            ]
+        ),
+        caa_result=caa_profiler.compare_samples(
+            "Strictly escrow protected!! Never bypass pgp.",
+            "Never bypass pgp!! Strictly escrow required.",
+            sample_id=f"CAA_{persona}"
+        )
+    )
+
+    graph_path = Path(f"./reports/{case_id}_investigation_graph.html")
+    ForensicGraphBuilder.render_html(report, graph_path)
+
+    console.print(f"[bold green]Interactive Graph Generated:[/bold green] [cyan]{graph_path.resolve()}[/cyan]")
+    if open_browser:
+        console.print("[dim]Opening interactive network canvas in your default web browser...[/dim]")
+        webbrowser.open(graph_path.resolve().as_uri())
+
 @app.command("verify-chain")
 def verify_chain_cmd():
-    """Verify cryptographic integrity of Section 65B BSA 2023 evidence ledger."""
     print_banner()
     console.print("[bold blue]Auditing Section 65B / BSA 2023 Cryptographic Hash Chain...[/bold blue]")
 

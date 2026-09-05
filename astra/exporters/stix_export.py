@@ -5,11 +5,6 @@ from typing import Dict, Any, List
 from astra.core.models import DacsAttributionReport
 
 class Stix21Exporter:
-    """
-    Exports ASTRA attribution intelligence into OASIS STIX 2.1 JSON format
-    for automated inter-agency intelligence sharing (NTRO, CBI, NIA, CERT-In).
-    """
-
     @staticmethod
     def generate_bundle(report: DacsAttributionReport) -> Dict[str, Any]:
         bundle_id = f"bundle--{uuid.uuid4()}"
@@ -19,7 +14,6 @@ class Stix21Exporter:
         report_id = f"report--{uuid.uuid4()}"
 
         objects: List[Dict[str, Any]] = [
-            # 1. Threat Actor Identity Object
             {
                 "type": "threat-actor",
                 "spec_version": "2.1",
@@ -28,7 +22,7 @@ class Stix21Exporter:
                 "modified": now_iso,
                 "name": report.target_persona,
                 "threat_actor_types": ["darknet-vendor", "cybercriminal"],
-                "description": f"De-anonymized darknet actor identified via ASTRA multi-pillar attribution (DACS {report.dacs_score}%).",
+                "description": f"Attributed darknet actor: DACS {report.dacs_score}%.",
                 "confidence": int(report.dacs_score),
                 "labels": ["dark-web", "sih2026", "de-anonymized"],
                 "custom_properties": {
@@ -36,7 +30,6 @@ class Stix21Exporter:
                     "x_astra_chain_hash": report.chain_of_custody_hash
                 }
             },
-            # 2. Intelligence Report Object
             {
                 "type": "report",
                 "spec_version": "2.1",
@@ -52,7 +45,6 @@ class Stix21Exporter:
             }
         ]
 
-        # Add indicators for key findings
         for finding in report.key_findings:
             ind_id = f"indicator--{uuid.uuid4()}"
             objects.append({
@@ -67,7 +59,6 @@ class Stix21Exporter:
                 "valid_from": now_iso,
                 "confidence": int(report.dacs_score)
             })
-            # Relationship linking indicator to threat actor
             objects.append({
                 "type": "relationship",
                 "spec_version": "2.1",

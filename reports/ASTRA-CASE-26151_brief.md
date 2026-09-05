@@ -1,20 +1,20 @@
-# 🛡️ ASTRA FORENSIC INTELLIGENCE DOSSIER
+# ASTRA FORENSIC INTELLIGENCE DOSSIER
 **Law Enforcement De-Anonymization Brief**  
-*Produced by ASTRA Engine (Team BISHOP / SIH 2026)*
+*Team BISHOP / SIH 2026*
 
 ---
 
-### 📋 Case Information
+### Case Information
 - **Case Reference ID**: `ASTRA-CASE-26151`
-- **Target Persona / Suspect Alias**: `VektorVendor_X`
-- **Generated At**: `2026-09-05T12:43:50.100995+00:00`
+- **Target Persona**: `VektorVendor_X`
+- **Generated At**: `2026-09-05T13:21:11.194477+00:00`
 - **DACS Attribution Confidence**: **`100.0%`**
-- **Forensic Verdict**: **`HIGH CONFIDENCE ATTRIBUTION (SECTION 65B COURT ADMISSIBLE)`**
+- **Verdict**: **`HIGH CONFIDENCE ATTRIBUTION (SECTION 65B COURT ADMISSIBLE)`**
 
 ---
 
-### 🏛️ Multi-Pillar Forensic Breakdown
-| Pillar | Focus Area | Confidence Score |
+### Multi-Pillar Forensic Breakdown
+| Pillar | Focus Domain | Confidence Score |
 | :--- | :--- | :--- |
 | **P1: INFRA-SCAN** | Tor Misconfiguration & JARM Recon | `1.00` |
 | **P2: MGRD** | Marketplace Ghost Residue & PGP Correlation | `1.00` |
@@ -23,7 +23,7 @@
 
 ---
 
-### 🔍 Corroborated Evidence & Indicators
+### Corroborated Evidence & Indicators
 - [P1] CRITICAL: SAN leaks clearnet domain 'auth.vektor-ops.ru' on darknet service
 - [P1] CRITICAL: SAN leaks clearnet domain '185.220.101.5' on darknet service
 - [P2] Discovered 1 PGP public key artifact(s) for persona 'VektorVendor_X'
@@ -34,10 +34,10 @@
 
 ---
 
-### ⚖️ Evidentiary Admissibility (Section 65B Indian Evidence Act / BSA 2023)
+### Section 65B Indian Evidence Act / BSA 2023 Verification
 - **Status**: `AUTHENTIC_AND_VERIFIED`
-- **Cumulative SHA-256 Chain Anchor**: `45df9e933f9b6118ea4f5bd0e2bf4574c796aa457fc8c940bb06e81d3157e6bb`
-- **Evidence Blocks Verified**: `36`
+- **Cumulative SHA-256 Chain Anchor**: `c69ff33ea5421f2f3bf485bf657d3302d109e79a5d68cb574f73927bad8e90af`
+- **Evidence Blocks Verified**: `50`
 - **Statutory Declaration**:  
   > *"This is to certify that the computer output containing threat intelligence and de-anonymization telemetries produced by ASTRA was generated during the regular course of autonomous passive reconnaissance under continuous SHA-256 cryptographic chain-of-custody."*
 

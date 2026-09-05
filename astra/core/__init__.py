@@ -9,6 +9,7 @@ from astra.core.models import (
     DacsAttributionReport
 )
 from astra.core.evidence import EvidenceLedger, ledger
+from astra.core.taxonomy import ThreatActivityClassifier, taxonomy_classifier
 
 __all__ = [
     "PillarType",
@@ -20,5 +21,7 @@ __all__ = [
     "CaaResult",
     "DacsAttributionReport",
     "EvidenceLedger",
-    "ledger"
+    "ledger",
+    "ThreatActivityClassifier",
+    "taxonomy_classifier"
 ]

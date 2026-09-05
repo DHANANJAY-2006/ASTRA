@@ -1,19 +1,19 @@
 {
   "type": "bundle",
-  "id": "bundle--a248525a-7920-4edb-9ec2-91012cc99ecd",
+  "id": "bundle--fc5aaa0b-7f68-4674-bd59-1964e50f4dcd",
   "objects": [
     {
       "type": "threat-actor",
       "spec_version": "2.1",
-      "id": "threat-actor--a6d56999-aecc-4290-a85c-7b869c4ffdd3",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "threat-actor--3b600b53-eacb-406c-9366-56344c230725",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "name": "VektorVendor_X",
       "threat_actor_types": [
         "darknet-vendor",
         "cybercriminal"
       ],
-      "description": "De-anonymized darknet actor identified via ASTRA multi-pillar attribution (DACS 100.0%).",
+      "description": "Attributed darknet actor: DACS 100.0%.",
       "confidence": 100,
       "labels": [
         "dark-web",
@@ -22,20 +22,20 @@
       ],
       "custom_properties": {
         "x_astra_case_id": "ASTRA-CASE-26151",
-        "x_astra_chain_hash": "45df9e933f9b6118ea4f5bd0e2bf4574c796aa457fc8c940bb06e81d3157e6bb"
+        "x_astra_chain_hash": "c69ff33ea5421f2f3bf485bf657d3302d109e79a5d68cb574f73927bad8e90af"
       }
     },
     {
       "type": "report",
       "spec_version": "2.1",
-      "id": "report--b0724c86-40b4-4fe8-8a2d-dfc016b3f39a",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "report--1100c370-de2c-445e-b72a-a2b41403df4a",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "name": "ASTRA Attribution Dossier: VektorVendor_X",
-      "description": "DACS Multi-Signal Fusion calculated for case 'ASTRA-CASE-26151' regarding persona 'VektorVendor_X'. Active pillars: 4/4. Multi-modal corroboration boost: +12%. Single-signal penalty: -0%.",
-      "published": "2026-09-05T12:43:50Z",
+      "description": "Case ASTRA-CASE-26151 for persona VektorVendor_X. Pillars active: 4/4. Corroboration boost: +12%. Sparse penalty: -0%.",
+      "published": "2026-09-05T13:21:11Z",
       "object_refs": [
-        "threat-actor--a6d56999-aecc-4290-a85c-7b869c4ffdd3"
+        "threat-actor--3b600b53-eacb-406c-9366-56344c230725"
       ],
       "confidence": 100,
       "labels": [
@@ -46,156 +46,156 @@
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--cf141ddf-95b3-4498-9c8f-857fa754ee0e",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "indicator--e7fb39ca-54c7-42d7-9061-4dea040c763a",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "name": "Darknet Attribution Indicator",
       "pattern": "[x-darknet-event:description = '[P1] CRITICAL: SAN leaks clearnet domain 'auth.vektor-ops.ru' on darknet service']",
       "pattern_type": "stix",
-      "valid_from": "2026-09-05T12:43:50Z",
+      "valid_from": "2026-09-05T13:21:11Z",
       "confidence": 100
     },
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--f2aa20ec-4d8f-4b8a-a20a-2261d13c8fbb",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "relationship--a5b42bd2-a03c-4ba7-a5ec-2fa205f8e490",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--cf141ddf-95b3-4498-9c8f-857fa754ee0e",
-      "target_ref": "threat-actor--a6d56999-aecc-4290-a85c-7b869c4ffdd3"
+      "source_ref": "indicator--e7fb39ca-54c7-42d7-9061-4dea040c763a",
+      "target_ref": "threat-actor--3b600b53-eacb-406c-9366-56344c230725"
     },
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--c0c65341-9679-496b-a2d6-6fe58ab895d6",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "indicator--b496e7d4-3729-4ad7-a13d-af98992c91e6",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "name": "Darknet Attribution Indicator",
       "pattern": "[x-darknet-event:description = '[P1] CRITICAL: SAN leaks clearnet domain '185.220.101.5' on darknet service']",
       "pattern_type": "stix",
-      "valid_from": "2026-09-05T12:43:50Z",
+      "valid_from": "2026-09-05T13:21:11Z",
       "confidence": 100
     },
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--9316fd26-9bc6-4c1a-bbd6-a4a98c9c2fbc",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "relationship--5db71f63-9d97-43da-bda3-94c16dccaecc",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--c0c65341-9679-496b-a2d6-6fe58ab895d6",
-      "target_ref": "threat-actor--a6d56999-aecc-4290-a85c-7b869c4ffdd3"
+      "source_ref": "indicator--b496e7d4-3729-4ad7-a13d-af98992c91e6",
+      "target_ref": "threat-actor--3b600b53-eacb-406c-9366-56344c230725"
     },
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--8061add6-e4f3-4779-82f2-8c36e7d2627b",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "indicator--f1c240f1-aee3-4413-9abc-0f699b631ca1",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "name": "Darknet Attribution Indicator",
       "pattern": "[x-darknet-event:description = '[P2] Discovered 1 PGP public key artifact(s) for persona 'VektorVendor_X'']",
       "pattern_type": "stix",
-      "valid_from": "2026-09-05T12:43:50Z",
+      "valid_from": "2026-09-05T13:21:11Z",
       "confidence": 100
     },
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--365f3a12-bfbe-47da-beab-2ccef744de3e",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "relationship--0b5621bd-cfa9-4914-ab1d-641c91f0acc9",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--8061add6-e4f3-4779-82f2-8c36e7d2627b",
-      "target_ref": "threat-actor--a6d56999-aecc-4290-a85c-7b869c4ffdd3"
+      "source_ref": "indicator--f1c240f1-aee3-4413-9abc-0f699b631ca1",
+      "target_ref": "threat-actor--3b600b53-eacb-406c-9366-56344c230725"
     },
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--3d8a110f-72d3-4ccf-ab76-24a3399bb4ca",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "indicator--25e43ce0-013c-44bb-b791-5c90bbc02827",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "name": "Darknet Attribution Indicator",
       "pattern": "[x-darknet-event:description = '[P2] CRITICAL: Exact PGP Key match (81B3E45C70A10D32) reused across multiple forums: ['AlphaBay_V2', 'BohemiaMarket', 'AbacusDarknet']']",
       "pattern_type": "stix",
-      "valid_from": "2026-09-05T12:43:50Z",
+      "valid_from": "2026-09-05T13:21:11Z",
       "confidence": 100
     },
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--f04584ef-e77f-4563-8c6f-7ededc3f89b4",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "relationship--4557e8ea-de2d-47fc-96c0-492699a97500",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--3d8a110f-72d3-4ccf-ab76-24a3399bb4ca",
-      "target_ref": "threat-actor--a6d56999-aecc-4290-a85c-7b869c4ffdd3"
+      "source_ref": "indicator--25e43ce0-013c-44bb-b791-5c90bbc02827",
+      "target_ref": "threat-actor--3b600b53-eacb-406c-9366-56344c230725"
     },
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--51c022f9-a184-4738-9a64-a14867f25ea5",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "indicator--fc199292-ecea-457d-a390-bf6c322b7d26",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "name": "Darknet Attribution Indicator",
       "pattern": "[x-darknet-event:description = '[P3] HIGH: Identified 2 pre-mixer micro-transaction test ritual(s) (< 0.003 BTC)']",
       "pattern_type": "stix",
-      "valid_from": "2026-09-05T12:43:50Z",
+      "valid_from": "2026-09-05T13:21:11Z",
       "confidence": 100
     },
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--af58e228-9ccb-466a-941c-214b45263912",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "relationship--e2ace44d-bdce-4e8b-a4c4-2edc4dc836c7",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--51c022f9-a184-4738-9a64-a14867f25ea5",
-      "target_ref": "threat-actor--a6d56999-aecc-4290-a85c-7b869c4ffdd3"
+      "source_ref": "indicator--fc199292-ecea-457d-a390-bf6c322b7d26",
+      "target_ref": "threat-actor--3b600b53-eacb-406c-9366-56344c230725"
     },
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--7f49f021-66de-48b6-b877-714c6c3e91fa",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "indicator--efbb6dbb-4be6-47b7-88e7-49a4b65c5d69",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "name": "Darknet Attribution Indicator",
       "pattern": "[x-darknet-event:description = '[P3] CRITICAL: Mixer interaction signature detected: CoinJoin / Wasabi / Whirlpool Equal-Output Pool Heuristic']",
       "pattern_type": "stix",
-      "valid_from": "2026-09-05T12:43:50Z",
+      "valid_from": "2026-09-05T13:21:11Z",
       "confidence": 100
     },
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--2637131b-1377-45b2-b2fe-b7e0fd6d2189",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "relationship--5003e4e7-6092-4c32-8b1e-0b6706b94c1b",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--7f49f021-66de-48b6-b877-714c6c3e91fa",
-      "target_ref": "threat-actor--a6d56999-aecc-4290-a85c-7b869c4ffdd3"
+      "source_ref": "indicator--efbb6dbb-4be6-47b7-88e7-49a4b65c5d69",
+      "target_ref": "threat-actor--3b600b53-eacb-406c-9366-56344c230725"
     },
     {
       "type": "indicator",
       "spec_version": "2.1",
-      "id": "indicator--9b2d750b-5401-436f-81b9-55ebeef4a21d",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "indicator--5e38463b-a029-4023-9603-9573826051f9",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "name": "Darknet Attribution Indicator",
       "pattern": "[x-darknet-event:description = '[P4] Stylometric cognitive similarity index: 0.65']",
       "pattern_type": "stix",
-      "valid_from": "2026-09-05T12:43:50Z",
+      "valid_from": "2026-09-05T13:21:11Z",
       "confidence": 100
     },
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--afa8b9cd-59df-443a-93b7-d9f1a2a0052a",
-      "created": "2026-09-05T12:43:50Z",
-      "modified": "2026-09-05T12:43:50Z",
+      "id": "relationship--bbd1b903-149b-4bbc-9475-786370fd2a83",
+      "created": "2026-09-05T13:21:11Z",
+      "modified": "2026-09-05T13:21:11Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--9b2d750b-5401-436f-81b9-55ebeef4a21d",
-      "target_ref": "threat-actor--a6d56999-aecc-4290-a85c-7b869c4ffdd3"
+      "source_ref": "indicator--5e38463b-a029-4023-9603-9573826051f9",
+      "target_ref": "threat-actor--3b600b53-eacb-406c-9366-56344c230725"
     }
   ]
 }

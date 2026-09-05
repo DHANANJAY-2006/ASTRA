@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 from datetime import datetime, timezone
-import pytest
 
 from astra.core.models import DacsAttributionReport
 from astra.exporters.stix_export import Stix21Exporter

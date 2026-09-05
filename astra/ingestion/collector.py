@@ -5,16 +5,9 @@ import httpx
 
 from astra.config import config
 from astra.core.evidence import ledger
-from astra.core.models import EvidenceType, EvidenceRecord
+from astra.core.models import EvidenceType
 
 class TorIngestionCollector:
-    """
-    DANTE 6-Stage Autonomous Ingestion Pipeline: Ingestion & Telemetry Collector.
-    Routes non-invasive passive requests through a local or remote Tor SOCKS5 proxy,
-    applies adaptive anti-rate-limiting jitter delays, and records raw responses into
-    the Section 65B hash chain ledger.
-    """
-
     def __init__(self, tor_proxy: Optional[str] = None):
         self.tor_proxy = tor_proxy or config.tor_proxy
         self.user_agent = config.user_agent
@@ -25,10 +18,6 @@ class TorIngestionCollector:
         timeout: Optional[float] = None,
         simulate_if_tor_unavailable: bool = True
     ) -> Dict[str, Any]:
-        """
-        Fetches an .onion resource over Tor SOCKS5 proxy with jitter delay and evidence anchoring.
-        """
-        # Apply anti-fingerprinting jitter delay
         jitter = random.uniform(config.jitter_min_seconds, config.jitter_max_seconds)
         time.sleep(jitter)
 
@@ -40,7 +29,6 @@ class TorIngestionCollector:
         }
 
         try:
-            # Attempt real Tor SOCKS5 fetch
             with httpx.Client(proxy=self.tor_proxy, timeout=req_timeout, headers=headers) as client:
                 response = client.get(onion_url)
                 content_bytes = response.content
@@ -49,9 +37,8 @@ class TorIngestionCollector:
                 source_mode = "LIVE_TOR_SOCKS5"
         except Exception as exc:
             if not simulate_if_tor_unavailable:
-                raise ConnectionError(f"Tor SOCKS5 proxy unavailable at {self.tor_proxy}: {str(exc)}")
+                raise ConnectionError(f"Tor proxy unavailable at {self.tor_proxy}: {str(exc)}")
             
-            # Safe forensic mock fallback when local Tor daemon is not running
             source_mode = "SIMULATED_TOR_ARTIFACT"
             status_code = 200
             resp_headers = {
@@ -66,7 +53,6 @@ class TorIngestionCollector:
                 f"<body><h1>Vendor Portal</h1><p>PGP Key fingerprint: 92F4 81B3 E45C</p></body></html>"
             ).encode("utf-8")
 
-        # Record captured raw telemetry into Section 65B hash chain
         evidence = ledger.record_evidence(
             evidence_type=EvidenceType.ONION_CRAWL,
             source_target=onion_url,
@@ -89,5 +75,4 @@ class TorIngestionCollector:
             "jitter_delay_applied": round(jitter, 2)
         }
 
-# Global singleton
 tor_collector = TorIngestionCollector()

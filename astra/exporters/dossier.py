@@ -1,15 +1,10 @@
 import json
 from pathlib import Path
-from typing import Dict, Any
 
 from astra.core.evidence import ledger
 from astra.core.models import DacsAttributionReport
 
 class ForensicDossierExporter:
-    """
-    Generates structured forensic intelligence briefs and Section 65B compliance dossiers.
-    """
-
     @staticmethod
     def export_json(report: DacsAttributionReport, output_path: Path) -> Path:
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -31,23 +26,23 @@ class ForensicDossierExporter:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         cert = ledger.generate_section_65b_certificate(case_reference=report.case_id)
 
-        md = f"""# 🛡️ ASTRA FORENSIC INTELLIGENCE DOSSIER
+        md = f"""# ASTRA FORENSIC INTELLIGENCE DOSSIER
 **Law Enforcement De-Anonymization Brief**  
-*Produced by ASTRA Engine (Team BISHOP / SIH 2026)*
+*Team BISHOP / SIH 2026*
 
 ---
 
-### 📋 Case Information
+### Case Information
 - **Case Reference ID**: `{report.case_id}`
-- **Target Persona / Suspect Alias**: `{report.target_persona}`
+- **Target Persona**: `{report.target_persona}`
 - **Generated At**: `{report.generated_at.isoformat()}`
 - **DACS Attribution Confidence**: **`{report.dacs_score}%`**
-- **Forensic Verdict**: **`{report.attribution_verdict}`**
+- **Verdict**: **`{report.attribution_verdict}`**
 
 ---
 
-### 🏛️ Multi-Pillar Forensic Breakdown
-| Pillar | Focus Area | Confidence Score |
+### Multi-Pillar Forensic Breakdown
+| Pillar | Focus Domain | Confidence Score |
 | :--- | :--- | :--- |
 | **P1: INFRA-SCAN** | Tor Misconfiguration & JARM Recon | `{report.pillar_scores.get('P1_INFRA_SCAN', 0.0):.2f}` |
 | **P2: MGRD** | Marketplace Ghost Residue & PGP Correlation | `{report.pillar_scores.get('P2_MGRD', 0.0):.2f}` |
@@ -56,7 +51,7 @@ class ForensicDossierExporter:
 
 ---
 
-### 🔍 Corroborated Evidence & Indicators
+### Corroborated Evidence & Indicators
 """
         for item in report.key_findings:
             md += f"- {item}\n"
@@ -64,7 +59,7 @@ class ForensicDossierExporter:
         md += f"""
 ---
 
-### ⚖️ Evidentiary Admissibility (Section 65B Indian Evidence Act / BSA 2023)
+### Section 65B Indian Evidence Act / BSA 2023 Verification
 - **Status**: `{cert['verification_status']}`
 - **Cumulative SHA-256 Chain Anchor**: `{cert['cumulative_evidence_hash']}`
 - **Evidence Blocks Verified**: `{cert['chain_records_count']}`
