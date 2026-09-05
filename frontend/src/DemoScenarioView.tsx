@@ -1,6 +1,5 @@
 import { useSyncExternalStore } from "react";
 import { ActorSearchResult } from "./api";
-import Badge from "./Badge";
 import { AlertIcon, LoaderIcon, PlayIcon } from "./icons";
 import { USERNAME_A, USERNAME_B, getSnapshot, resetDemo, runDemo, subscribe } from "./demoScenarioStore";
 
@@ -48,7 +47,9 @@ export default function DemoScenarioView({
           submission uses. Nothing here bypasses the application or writes to the database
           directly.
         </p>
-        <Badge variant="synthetic" label="Synthetic / Controlled Environment" />
+        <span className="inline-block px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-950/80 text-amber-400 border border-amber-800">
+          Synthetic / Controlled Environment
+        </span>
       </div>
 
       <div className="section-card" style={{ marginBottom: "1.5rem" }}>

@@ -96,7 +96,7 @@ export default function VideoShowcaseModal({ isOpen, onClose }) {
           <div className="flex items-center space-x-2.5">
             <Film className="w-5 h-5 text-cyan-400" />
             <span className="font-bold text-slate-100 text-sm">
-              SENTINEL-X Animated Architecture &amp; Demo Showcase
+              PROJECT ASTRA // Architecture &amp; Interactive Showcase
             </span>
           </div>
 

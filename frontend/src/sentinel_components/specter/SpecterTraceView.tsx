@@ -42,22 +42,22 @@ export default function SpecterTraceView() {
   return (
     <div className="h-full min-h-[calc(100vh-60px)] w-full bg-[#070a13] text-slate-200 flex flex-col justify-between font-sans selection:bg-cyan-500 selection:text-black">
       {/* TOP HEADER: DEFENSE INTELLIGENCE APPARATUS */}
-      <header className="px-5 py-2.5 bg-[#0b1220]/95 backdrop-blur-xl border-b border-[rgba(0,240,255,0.18)] flex items-center justify-between shadow-cyber-glow shrink-0 z-20">
+      <header className="px-5 py-2.5 bg-[#0b1220]/95 backdrop-blur-xl border-b border-theme-accent flex items-center justify-between shadow-theme-glow shrink-0 z-20">
         <div className="flex items-center space-x-3.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/30 border border-cyan-400/60 flex items-center justify-center shadow-[0_0_15px_rgba(0,240,255,0.3)]">
-            <ShieldAlert className="w-5 h-5 text-cyan-400 animate-pulse" />
+          <div className="w-9 h-9 rounded-full overflow-hidden border border-theme-accent flex items-center justify-center bg-white p-0.5 shadow-theme-glow shrink-0">
+            <img src="/logo.png" alt="ASTRA Logo" className="w-full h-full object-cover rounded-full" />
           </div>
           <div>
             <div className="flex items-center space-x-2 font-mono">
               <span className="font-black text-base tracking-widest text-slate-100 uppercase">
-                SPECTER<span className="text-cyan-400">-TRACE</span>
+                ASTRA<span className="text-theme-accent">-TRACE</span>
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded bg-red-950/90 text-red-400 border border-red-800 font-bold uppercase tracking-wider">
                 RESTRICTED // NTRO
               </span>
             </div>
             <div className="text-[11px] font-mono text-slate-400 flex items-center space-x-2">
-              <span className="text-cyan-400 font-bold">SIH26151</span>
+              <span className="text-theme-accent font-bold">SIH26151</span>
               <span>•</span>
               <span className="text-slate-300">National Cyber Threat Actor Attribution Workbench</span>
             </div>

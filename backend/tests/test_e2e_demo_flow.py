@@ -29,7 +29,7 @@ def test_01_module_health():
     assert modules["D_correlation"] == "up"
     assert modules["E_graph"] == "up"
     assert modules["F_audit"] == "up"
-    print("✓ Test 01 Passed: All 6 Modules Operational")
+    print("[PASS] Test 01 Passed: All 6 Modules Operational")
 
 
 def test_02_ingest_and_cryptographic_extraction():
@@ -52,7 +52,7 @@ def test_02_ingest_and_cryptographic_extraction():
     assert "btc_address" in types
     assert "pgp_key" in types
     assert "email" in types
-    print("✓ Test 02 Passed: Ingestion & Cryptographic Artifact Extraction Verified")
+    print("[PASS] Test 02 Passed: Ingestion & Cryptographic Artifact Extraction Verified")
 
 
 def test_03_stylometry_and_timezone():
@@ -76,7 +76,7 @@ def test_03_stylometry_and_timezone():
     ist_entry = next((tz for tz in data["timezone_ranking"] if "UTC+05:30" in tz["tz"]), None)
     assert ist_entry is not None
     assert ist_entry["overlap_score"] > 0.5
-    print(f"✓ Test 03 Passed: Stylometry & Timezone Alignment Verified ({ist_entry['tz']} overlap: {ist_entry['overlap_score']})")
+    print(f"[PASS] Test 03 Passed: Stylometry & Timezone Alignment Verified ({ist_entry['tz']} overlap: {ist_entry['overlap_score']})")
 
 
 def test_04_knowledge_graph_and_shortest_path():
@@ -107,7 +107,7 @@ def test_04_knowledge_graph_and_shortest_path():
     path = path_data["path"]
     assert path[0] == src
     assert path[-1] == dst
-    print(f"✓ Test 04 Passed: Knowledge Graph Evidentiary Path Solved ({len(path)} hops to cash-out exit)")
+    print(f"[PASS] Test 04 Passed: Knowledge Graph Evidentiary Path Solved ({len(path)} hops to cash-out exit)")
 
 
 def test_05_multi_signal_correlation_math():
@@ -119,7 +119,7 @@ def test_05_multi_signal_correlation_math():
     assert "c_total" in corr
     assert corr["c_total"] > 0.85
     assert len(corr["breakdown"]) >= 3
-    print(f"✓ Test 05 Passed: Multi-Signal C_total Attribution Math Verified ({corr['c_total_pct']})")
+    print(f"[PASS] Test 05 Passed: Multi-Signal C_total Attribution Math Verified ({corr['c_total_pct']})")
 
 
 def test_06_merkle_audit_tamper_and_repair():
@@ -148,7 +148,7 @@ def test_06_merkle_audit_tamper_and_repair():
     res_v3 = client.get("/api/audit/verify")
     assert res_v3.status_code == 200
     assert res_v3.json()["valid"] is True
-    print("✓ Test 06 Passed: Merkle Audit Tamper Injection & Real-Time Detection Verified")
+    print("[PASS] Test 06 Passed: Merkle Audit Tamper Injection & Real-Time Detection Verified")
 
 
 def test_07_court_admissible_pdf_dossier():
@@ -170,7 +170,7 @@ def test_07_court_admissible_pdf_dossier():
     # Verify PDF magic header
     assert res.content.startswith(b"%PDF")
     assert len(res.content) > 5000  # Multi-page formal document
-    print(f"✓ Test 07 Passed: Forensic Court PDF Dossier Generated ({len(res.content)} bytes, Valid %PDF header)")
+    print(f"[PASS] Test 07 Passed: Forensic Court PDF Dossier Generated ({len(res.content)} bytes, Valid %PDF header)")
 
 
 if __name__ == "__main__":

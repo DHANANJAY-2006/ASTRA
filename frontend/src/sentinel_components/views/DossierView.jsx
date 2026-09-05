@@ -19,7 +19,7 @@ async function fetchDossierPdf(caseId) {
     fetch(`/api/cases/${caseId}/dossier/pdf`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-  let res = await tryFetch(localStorage.getItem("sentinelx_token"));
+  let res = await tryFetch(localStorage.getItem("astra_token") || localStorage.getItem("sentinelx_token"));
   if (res.status === 403) {
     const login = await fetch("/api/auth/login", {
       method: "POST",
@@ -28,7 +28,7 @@ async function fetchDossierPdf(caseId) {
     });
     if (!login.ok) throw new Error("SOC Lead authentication failed");
     const { access_token } = await login.json();
-    localStorage.setItem("sentinelx_token", access_token);
+    localStorage.setItem("astra_token", access_token);
     res = await tryFetch(access_token);
   }
   if (!res.ok) throw new Error(`Export failed (HTTP ${res.status})`);
@@ -46,7 +46,7 @@ export default function DossierView({ caseData }) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `SENTINEL-X_DOSSIER_${caseId.slice(0, 8)}.pdf`;
+      a.download = `ASTRA_DOSSIER_${caseId.slice(0, 8)}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
       setNotice({ kind: "ok", text: "Dossier exported — action logged to the hash-chained audit trail." });
@@ -103,8 +103,8 @@ export default function DossierView({ caseData }) {
           <div className="text-base font-bold tracking-wider text-slate-100 uppercase">
             National Technical Research Organisation (NTRO)
           </div>
-          <div className="text-xs text-cyan-400 font-semibold tracking-wide">
-            SENTINEL-X — DARK WEB THREAT ACTOR DE-ANONYMIZATION PLATFORM
+          <div className="text-xs text-theme-accent font-semibold tracking-wide">
+            PROJECT ASTRA — DARK WEB THREAT ACTOR DE-ANONYMIZATION PLATFORM
           </div>
           <div className="text-[11px] text-slate-400">
             Problem Statement ID: SIH26151 • Evidentiary Attribution Dossier

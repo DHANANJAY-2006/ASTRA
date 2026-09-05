@@ -18,7 +18,7 @@ export function generateNtroPdfDossier(actor: ActorData, analystName: string = "
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
   doc.setTextColor(0, 240, 255);
-  doc.text("SENTINEL-X // NTRO CLASSIFIED INTELLIGENCE DOSSIER", 14, 12);
+  doc.text("PROJECT ASTRA // NTRO CLASSIFIED INTELLIGENCE DOSSIER", 14, 12);
 
   doc.setFontSize(9);
   doc.setFont("courier", "normal");
@@ -179,7 +179,7 @@ export async function downloadNtroPdfDossier(actor: ActorData, analystName: stri
       const cases = await casesRes.json();
       if (cases && cases.length > 0) {
         const caseId = cases[0].id;
-        let token = typeof window !== "undefined" ? localStorage.getItem("sentinelx_token") : null;
+        let token = typeof window !== "undefined" ? (localStorage.getItem("astra_token") || localStorage.getItem("sentinelx_token")) : null;
         if (!token) {
           const loginRes = await fetch(`${API_BASE}/api/auth/login`, {
             method: "POST",
@@ -201,7 +201,7 @@ export async function downloadNtroPdfDossier(actor: ActorData, analystName: stri
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = `NTRO_Section65B_Forensic_Dossier_${actor.codename}.pdf`;
+          a.download = `ASTRA_Section65B_Forensic_Dossier_${actor.codename}.pdf`;
           document.body.appendChild(a);
           a.click();
           a.remove();

@@ -39,8 +39,13 @@ audit_results = []
 
 def record(test_name: str, passed: bool, detail: str = ""):
     audit_results.append({"test": test_name, "passed": passed, "detail": detail})
-    symbol = "✓" if passed else "✗"
+    symbol = "[PASS]" if passed else "[FAIL]"
     print(f"{symbol} {test_name}: {detail}")
+
+
+def test_exhaustive_audit():
+    failed = run_all_audits()
+    assert failed == 0
 
 
 def run_all_audits():

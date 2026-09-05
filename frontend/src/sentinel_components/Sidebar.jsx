@@ -78,14 +78,6 @@ export default function Sidebar({ activeTab, setActiveTab, caseData }) {
       badge: "LIVE DEMO",
       badgeColor: "bg-emerald-950 text-emerald-300 border border-emerald-800/60",
     },
-    {
-      id: "presentation",
-      label: "Slide Presentation",
-      sublabel: "10-Slide Deck for Judges",
-      icon: Layers,
-      badge: "SLIDES",
-      badgeColor: "bg-indigo-950 text-indigo-300 border border-indigo-800/60",
-    },
   ];
 
   return (
@@ -105,20 +97,20 @@ export default function Sidebar({ activeTab, setActiveTab, caseData }) {
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-start space-x-3 px-3 py-2.5 rounded-lg text-left transition-all duration-150 ${
                 isActive
-                  ? "bg-gradient-to-r from-cyan-950/60 to-slate-900 border border-cyan-500/40 text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.15)]"
+                  ? "bg-theme-subtle border border-theme-strong text-theme-accent shadow-theme-glow font-bold"
                   : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 border border-transparent"
               }`}
             >
               <div
                 className={`mt-0.5 p-1.5 rounded ${
-                  isActive ? "bg-cyan-500/20 text-cyan-400" : "bg-slate-800/80 text-slate-400"
+                  isActive ? "bg-theme-subtle text-theme-accent" : "bg-slate-800/80 text-slate-400"
                 }`}
               >
                 <Icon className="w-4 h-4" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className={`text-xs font-semibold tracking-wide ${isActive ? "text-cyan-100" : "text-slate-200"}`}>
+                  <span className={`text-xs font-semibold tracking-wide ${isActive ? "text-theme-accent" : "text-slate-200"}`}>
                     {item.label}
                   </span>
                   <span className={`text-[9px] font-mono px-1 py-0.2 rounded font-semibold ${item.badgeColor}`}>
@@ -143,7 +135,7 @@ export default function Sidebar({ activeTab, setActiveTab, caseData }) {
               HIGH PRIORITY
             </span>
           </div>
-          <div className="mt-1 font-mono font-bold text-sm text-cyan-400 flex items-center space-x-1.5">
+          <div className="mt-1 font-mono font-bold text-sm text-theme-accent flex items-center space-x-1.5">
             <span>DarkViper</span>
             <span className="text-[10px] font-normal text-slate-400 font-sans">(Ransomware Broker)</span>
           </div>

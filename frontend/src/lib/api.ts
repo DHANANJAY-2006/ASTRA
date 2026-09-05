@@ -7,15 +7,15 @@ let authToken: string | null = null;
 export function setAuthToken(token: string | null) {
   authToken = token;
   if (typeof window !== "undefined") {
-    if (token) localStorage.setItem("sentinelx_token", token);
-    else localStorage.removeItem("sentinelx_token");
+    if (token) localStorage.setItem("astra_token", token);
+    else localStorage.removeItem("astra_token");
   }
 }
 
 export function getAuthToken(): string | null {
   if (authToken) return authToken;
   if (typeof window !== "undefined") {
-    authToken = localStorage.getItem("sentinelx_token");
+    authToken = localStorage.getItem("astra_token") || localStorage.getItem("sentinelx_token");
   }
   return authToken;
 }
@@ -42,7 +42,7 @@ export async function login(username: string, password: string): Promise<LoginRe
       method: "POST", body: JSON.stringify({ username, password }),
     });
   } catch {
-    return { access_token: "mock-jwt-token-sentinel-x-2026", role: "soc_lead", user: username || "anjali" };
+    return { access_token: "mock-jwt-token-astra-2026", role: "soc_lead", user: username || "anjali" };
   }
 }
 
@@ -315,7 +315,7 @@ export async function healthCheck(): Promise<{ status: string; version: string }
   try {
     return await request<{ status: string; version: string }>("/api/health");
   } catch {
-    return { status: "ok", version: "0.1.0-sentinelx-client" };
+    return { status: "ok", version: "1.0.0-astra-client" };
   }
 }
 

@@ -8,7 +8,6 @@ import StylometryView from "./sentinel_components/views/StylometryView";
 import IngestView from "./sentinel_components/views/IngestView";
 import AuditView from "./sentinel_components/views/AuditView";
 import DossierView from "./sentinel_components/views/DossierView";
-import PresentationView from "./sentinel_components/views/PresentationView";
 import DemoScenarioView from "./DemoScenarioView";
 import DemoGuideModal from "./sentinel_components/DemoGuideModal";
 import VideoShowcaseModal from "./sentinel_components/views/VideoShowcaseModal";
@@ -17,6 +16,12 @@ import { getCases, getCase, getGraph, getAuditLog, healthCheck, type CaseItem, t
 export type View = { name: string; actorId?: string };
 
 export default function App() {
+  const [activeTheme, setActiveTheme] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("astra_theme") || "blue";
+    }
+    return "blue";
+  });
   const [activeTab, setActiveTab] = useState<string>("specter");
   const [activeRole, setActiveRole] = useState<string>("analyst_demo");
   const [health, setHealth] = useState<any>({ status: "ok", modules: { A_ingestion: "up", B_extraction: "up", C_stylometry: "up", D_correlation: "up", E_graph: "up", F_audit: "up" } });
@@ -28,6 +33,13 @@ export default function App() {
 
   const [showPitchHud, setShowPitchHud] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
+
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.setAttribute("data-theme", activeTheme);
+      localStorage.setItem("astra_theme", activeTheme);
+    }
+  }, [activeTheme]);
 
   const loadData = async () => {
     try {
@@ -101,6 +113,8 @@ export default function App() {
         onRefresh={loadData}
         onTogglePitchHud={() => setShowPitchHud(true)}
         onToggleVideoModal={() => setShowVideoModal(true)}
+        activeTheme={activeTheme}
+        onThemeChange={setActiveTheme}
       />
 
       {/* BODY WITH TACTICAL SIDEBAR + CONTENT AREA */}
@@ -158,8 +172,6 @@ export default function App() {
               <DemoScenarioView onSelectActor={() => {}} />
             </div>
           )}
-
-          {activeTab === "presentation" && <PresentationView />}
         </main>
       </div>
 
